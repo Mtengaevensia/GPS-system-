@@ -218,15 +218,14 @@
                             
                             <div class="mb-4">
                                 <h6 class="text-muted mb-1">Recommended Action</h6>
-                                <p class="mb-0 text-muted">Based on the alert type and severity, the system recommends the following action:</p>
-                                <p class="mb-0 mt-2" id="viewRecommendedAction"></p>
+                                <p class="mb-0" id="viewRecommendedAction"></p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#editAlertModal">Edit Alert</button>
+                    <button type="button" class="btn btn-primary">Take Action</button>
                 </div>
             </div>
         </div>
@@ -248,12 +247,13 @@
                                 <label for="vehicleSelect" class="form-label">Vehicle</label>
                                 <select class="form-select" id="vehicleSelect" name="vehicle_id" required>
                                     <option value="">Select Vehicle</option>
-                                    @foreach($vehicles as $vehicle)
-                                        <option value="{{ $vehicle['id'] }}">{{ $vehicle['name'] }}</option>
-                                    @endforeach
+                                    <option value="TRK-1234">TRK-1234 (Truck)</option>
+                                    <option value="VAN-5678">VAN-5678 (Van)</option>
+                                    <option value="CAR-9012">CAR-9012 (Car)</option>
+                                    <option value="TRK-3456">TRK-3456 (Truck)</option>
+                                    <option value="CAR-7890">CAR-7890 (Car)</option>
                                 </select>
                             </div>
-                            
                             <div class="col-md-6">
                                 <label for="alertType" class="form-label">Alert Type</label>
                                 <select class="form-select" id="alertType" name="type" required>
@@ -267,32 +267,29 @@
                                     <option value="Battery">Battery</option>
                                 </select>
                             </div>
-                            
-                            <div class="col-12">
-                                <label for="alertMessage" class="form-label">Message</label>
-                                <textarea class="form-control" id="alertMessage" name="message" rows="3" required></textarea>
-                            </div>
-                            
                             <div class="col-md-6">
                                 <label for="alertSeverity" class="form-label">Severity</label>
                                 <select class="form-select" id="alertSeverity" name="severity" required>
                                     <option value="">Select Severity</option>
-                                    <option value="Low">Low</option>
-                                    <option value="Medium">Medium</option>
                                     <option value="High">High</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Low">Low</option>
                                 </select>
                             </div>
-                            
                             <div class="col-md-6">
                                 <label for="alertTimestamp" class="form-label">Timestamp</label>
-                                <input type="datetime-local" class="form-control" id="alertTimestamp" name="timestamp" value="{{ date('Y-m-d\TH:i') }}" required>
+                                <input type="datetime-local" class="form-control" id="alertTimestamp" name="timestamp" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="alertMessage" class="form-label">Message</label>
+                                <textarea class="form-control" id="alertMessage" name="message" rows="3" required></textarea>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="saveNewAlert">Save Alert</button>
+                    <button type="submit" form="addAlertForm" class="btn btn-primary">Create Alert</button>
                 </div>
             </div>
         </div>
@@ -311,22 +308,14 @@
                         @csrf
                         @method('PUT')
                         <input type="hidden" id="editAlertId" name="id">
-                        
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label for="editVehicleSelect" class="form-label">Vehicle</label>
-                                <select class="form-select" id="editVehicleSelect" name="vehicle_id" required>
-                                    <option value="">Select Vehicle</option>
-                                    @foreach($vehicles as $vehicle)
-                                        <option value="{{ $vehicle['id'] }}">{{ $vehicle['name'] }}</option>
-                                    @endforeach
-                                </select>
+                                <label for="editVehicleId" class="form-label">Vehicle ID</label>
+                                <input type="text" class="form-control" id="editVehicleId" name="vehicle_id" readonly>
                             </div>
-                            
                             <div class="col-md-6">
                                 <label for="editAlertType" class="form-label">Alert Type</label>
                                 <select class="form-select" id="editAlertType" name="type" required>
-                                    <option value="">Select Type</option>
                                     <option value="Overspeed">Overspeed</option>
                                     <option value="GeoFence">GeoFence</option>
                                     <option value="Offline">Offline</option>
@@ -336,32 +325,28 @@
                                     <option value="Battery">Battery</option>
                                 </select>
                             </div>
-                            
-                            <div class="col-12">
-                                <label for="editAlertMessage" class="form-label">Message</label>
-                                <textarea class="form-control" id="editAlertMessage" name="message" rows="3" required></textarea>
-                            </div>
-                            
                             <div class="col-md-6">
                                 <label for="editAlertSeverity" class="form-label">Severity</label>
                                 <select class="form-select" id="editAlertSeverity" name="severity" required>
-                                    <option value="">Select Severity</option>
-                                    <option value="Low">Low</option>
-                                    <option value="Medium">Medium</option>
                                     <option value="High">High</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Low">Low</option>
                                 </select>
                             </div>
-                            
                             <div class="col-md-6">
                                 <label for="editAlertTimestamp" class="form-label">Timestamp</label>
                                 <input type="datetime-local" class="form-control" id="editAlertTimestamp" name="timestamp" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="editAlertMessage" class="form-label">Message</label>
+                                <textarea class="form-control" id="editAlertMessage" name="message" rows="3" required></textarea>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="updateAlert">Update Alert</button>
+                    <button type="submit" form="editAlertForm" class="btn btn-primary">Update Alert</button>
                 </div>
             </div>
         </div>
@@ -384,6 +369,7 @@
                     <form id="deleteAlertForm" action="{{ url('alerts/destroy') }}" method="POST">
                         @csrf
                         @method('DELETE')
+                        <input type="hidden" id="deleteAlertId" name="id">
                         <button type="submit" class="btn btn-danger">Delete Alert</button>
                     </form>
                 </div>
@@ -417,12 +403,12 @@
                     return 'Monitor situation. Contact driver if idle time exceeds 1 hour.';
                 } else if (type === 'Maintenance') {
                     return 'Schedule vehicle for maintenance service at earliest convenience.';
-                } else if (type === 'Fuel' && severity === 'High') {
-                    return 'Investigate potential fuel theft. Compare with driver logs and receipts.';
+                } else if (type === 'Fuel') {
+                    return 'Check for fuel leakage or theft. Compare with recent fuel consumption patterns.';
                 } else if (type === 'Battery') {
-                    return 'Schedule battery check. Consider replacement if vehicle is over 3 years old.';
+                    return 'Dispatch technician to check battery and electrical system.';
                 } else {
-                    return 'Review alert details and take appropriate action based on company policy.';
+                    return 'Assess situation and take appropriate action based on company protocol.';
                 }
             }
             
@@ -461,11 +447,11 @@
                     // Severity badge
                     const severityContainer = document.getElementById('viewSeverityContainer')
                     if (severity === 'High') {
-                        severityContainer.innerHTML = '<span class="badge rounded-pill text-bg-danger">High</span>'
+                        severityContainer.innerHTML = '<span class="badge rounded-pill text-bg-danger fs-6">High</span>'
                     } else if (severity === 'Medium') {
-                        severityContainer.innerHTML = '<span class="badge rounded-pill text-bg-warning">Medium</span>'
+                        severityContainer.innerHTML = '<span class="badge rounded-pill text-bg-warning fs-6">Medium</span>'
                     } else {
-                        severityContainer.innerHTML = '<span class="badge rounded-pill text-bg-success">Low</span>'
+                        severityContainer.innerHTML = '<span class="badge rounded-pill text-bg-success fs-6">Low</span>'
                     }
                 })
             }
@@ -487,6 +473,38 @@
                     
                     // Update the modal's content
                     document.getElementById('editAlertId').value = id
-                    document.getElementById('editVehicleSelect').value = vehicle
+                    document.getElementById('editVehicleId').value = vehicle
                     document.getElementById('editAlertType').value = type
-                    document.getElementById('editAlertMessage
+                    document.getElementById('editAlertMessage').value = message
+                    document.getElementById('editAlertTimestamp').value = formatDateForInput(timestamp)
+                    document.getElementById('editAlertSeverity').value = severity
+                })
+            }
+            
+            // Delete Confirmation Modal
+            const deleteConfirmModal = document.getElementById('deleteConfirmModal')
+            if (deleteConfirmModal) {
+                deleteConfirmModal.addEventListener('show.bs.modal', event => {
+                    // Button that triggered the modal
+                    const button = event.relatedTarget
+                    
+                    // Extract info from data-bs-* attributes
+                    const id = button.getAttribute('data-bs-id')
+                    const vehicle = button.getAttribute('data-bs-vehicle')
+                    
+                    // Update the modal's content
+                    document.getElementById('deleteAlertVehicle').textContent = vehicle
+                    document.getElementById('deleteAlertId').value = id
+                })
+            }
+            
+            // Set current date and time for new alert timestamp
+            const alertTimestamp = document.getElementById('alertTimestamp')
+            if (alertTimestamp) {
+                const now = new Date()
+                alertTimestamp.value = now.toISOString().slice(0, 16)
+            }
+        });
+    </script>
+</x-app-layout>
+

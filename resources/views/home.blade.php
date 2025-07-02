@@ -1,95 +1,236 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Home') }}
-        </h2>
-    </x-slot>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="GPS Navigator - Real-time vehicle tracking and fleet management system">
+    
+    <title>GPS Navigator | Home</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
+    <!-- Custom styles -->
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        .feature-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bg-primary-light {
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+        .bg-success-light {
+            background-color: rgba(25, 135, 84, 0.1);
+        }
+        .bg-info-light {
+            background-color: rgba(13, 202, 240, 0.1);
+        }
+        .bg-warning-light {
+            background-color: rgba(255, 193, 7, 0.1);
+        }
+        @media (max-width: 767.98px) {
+            .login-card {
+                margin-top: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" aria-label="GPS Navigator Home">
+                <i class="bi bi-geo-alt-fill text-primary me-2"></i>
+                GPS Navigator
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" aria-current="page">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url('alerts/index') }}">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>Alerts
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
-                <div class="p-6">
-                    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Welcome to GPS Navigator</h1>
-                    <p class="text-gray-600 dark:text-gray-400">
-                        Track your vehicles in real-time with precision and ease. Our GPS Navigator system helps you stay connected to your fleet anytime, anywhere with industry-leading technology.
+    <!-- Main Content -->
+    <main class="py-5">
+        <div class="container">
+            <div class="row g-4 align-items-center">
+                <!-- Left Column: Welcome Content -->
+                <div class="col-lg-6">
+                    <h1 class="display-5 fw-bold mb-3">Welcome to GPS Navigator</h1>
+                    <p class="lead text-secondary mb-4">
+                        Track your vehicles in real-time with precision and ease. Our system helps you stay connected to your fleet anytime, anywhere.
                     </p>
                     
                     <!-- Feature List -->
-                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <div class="p-3 rounded-full bg-indigo-100 dark:bg-indigo-900">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
+                    <div class="row g-4 py-2">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <div class="feature-icon bg-primary-light me-3">
+                                    <i class="bi bi-geo-alt text-primary fs-4"></i>
                                 </div>
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Real-time GPS tracking</h3>
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                    Monitor your vehicles with live updates and precise location data.
-                                </p>
+                                <div>
+                                    <h5 class="fw-semibold mb-1">Real-time tracking</h5>
+                                    <p class="text-muted small mb-0">Monitor vehicles with live updates</p>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <div class="p-3 rounded-full bg-green-100 dark:bg-green-900">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                                    </svg>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <div class="feature-icon bg-success-light me-3">
+                                    <i class="bi bi-bell text-success fs-4"></i>
                                 </div>
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Instant alerts</h3>
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                    Receive SMS & Email notifications for important events.
-                                </p>
+                                <div>
+                                    <h5 class="fw-semibold mb-1">Instant alerts</h5>
+                                    <p class="text-muted small mb-0">Get SMS & Email notifications</p>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                                    </svg>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <div class="feature-icon bg-info-light me-3">
+                                    <i class="bi bi-map text-info fs-4"></i>
                                 </div>
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Smart route optimization</h3>
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                    Save fuel costs with intelligent route planning.
-                                </p>
+                                <div>
+                                    <h5 class="fw-semibold mb-1">Route optimization</h5>
+                                    <p class="text-muted small mb-0">Save fuel with smart planning</p>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 dark:text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                                    </svg>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <div class="feature-icon bg-warning-light me-3">
+                                    <i class="bi bi-download text-warning fs-4"></i>
                                 </div>
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Offline map access</h3>
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                    Access maps even in remote locations without internet.
-                                </p>
+                                <div>
+                                    <h5 class="fw-semibold mb-1">Offline maps</h5>
+                                    <p class="text-muted small mb-0">Access maps without internet</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="mt-8">
-                        <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            Go to Dashboard
-                        </a>
+                </div>
+                
+                <!-- Right Column: Login Form -->
+                <div class="col-lg-5 offset-lg-1">
+                    <div class="card shadow-sm login-card">
+                        <div class="card-body p-4">
+                            <h2 class="card-title h4 fw-bold mb-4">Log In to Your Account</h2>
+                            
+                            @if (session('status'))
+                                <div class="alert alert-success mb-3" role="alert">
+                                    {{ session('status') }}
+                                </div>
+                            @endif
+                            
+                            <form method="POST" action="{{ route('login') }}">
+                                @csrf
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email address</label>
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required autofocus aria-describedby="emailHelp">
+                                    @error('email')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="remember_me" name="remember">
+                                    <label class="form-check-label" for="remember_me">Remember me</label>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary py-2">Sign In</button>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    @if (Route::has('password.request'))
+                                        <a href="{{ route('password.request') }}" class="text-decoration-none small">
+                                            Forgot your password?
+                                        </a>
+                                    @endif
+                                    
+                                    @if (Route::has('register'))
+                                        <a href="{{ route('register') }}" class="text-decoration-none small">
+                                            Create an account
+                                        </a>
+                                    @endif
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</x-app-layout>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-light py-4 mt-auto border-top">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 small">
+                    <span class="text-muted">&copy; {{ date('Y') }} GPS Navigator. All rights reserved.</span>
+                </div>
+                <div class="col-md-6 text-md-end small">
+                    <a href="#" class="text-decoration-none text-muted me-3">Privacy Policy</a>
+                    <a href="#" class="text-decoration-none text-muted me-3">Terms of Service</a>
+                    <a href="#" class="text-decoration-none text-muted">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+</body>
+</html>
+
+
+
 

@@ -10,154 +10,51 @@
             <!-- Page Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h1 class="h3 mb-0">Vehicles</h1>
-                    <p class="text-muted">Manage and monitor all vehicles in the system.</p>
+                    <h1 class="h3 mb-0">Vehicle Management</h1>
+                    <p class="text-muted">Manage your fleet vehicles</p>
                 </div>
-                <button type="button" class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addVehicleModal">
-                    <i class="bi bi-plus-lg me-2"></i> Add Vehicle
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVehicleModal">
+                    <i class="bi bi-plus-circle me-1"></i> Add Vehicle
                 </button>
             </div>
-
-            <!-- Filters and Search -->
+            
+            <!-- Filters -->
             <div class="card border-0 shadow mb-4">
-                <div class="card-body p-4">
-                    <form action="{{ url('vehicle/index') }}" method="GET">
-                        <div class="row g-3">
-                            <div class="col-12 col-md-3">
-                                <label for="statusFilter" class="form-label small text-muted">Status</label>
-                                <select class="form-select" id="statusFilter" name="status">
-                                    <option value="">All Statuses</option>
-                                    <option value="Active">Active</option>
-                                    <option value="Offline">Offline</option>
-                                    <option value="Maintenance">Maintenance</option>
-                                </select>
-                            </div>
-                            <div class="col-12 col-md-3">
-                                <label for="typeFilter" class="form-label small text-muted">Vehicle Type</label>
-                                <select class="form-select" id="typeFilter" name="type">
-                                    <option value="">All Types</option>
-                                    <option value="Truck">Truck</option>
-                                    <option value="Van">Van</option>
-                                    <option value="Car">Car</option>
-                                </select>
-                            </div>
-                            <div class="col-12 col-md-4">
-                                <label for="searchPlate" class="form-label small text-muted">Plate Number</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0">
-                                        <i class="bi bi-search text-muted"></i>
-                                    </span>
-                                    <input type="text" class="form-control border-start-0" id="searchPlate" name="search" placeholder="Search plate number...">
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-2 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="bi bi-funnel me-2"></i> Filter
-                                </button>
-                            </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="typeFilter" class="form-label">Vehicle Type</label>
+                            <select class="form-select" id="typeFilter">
+                                <option value="">All Types</option>
+                                <option value="Truck">Truck</option>
+                                <option value="Van">Van</option>
+                                <option value="Car">Car</option>
+                            </select>
                         </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Vehicles Table -->
-            <div class="card border-0 shadow">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th scope="col" class="ps-4">#</th>
-                                    <th scope="col">Plate Number</th>
-                                    <th scope="col">Type</th>
-                                    <th scope="col">Assigned Driver</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Last Location</th>
-                                    <th scope="col" class="text-end pe-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($vehicles as $vehicle)
-                                <tr>
-                                    <td class="ps-4">{{ $vehicle['id'] }}</td>
-                                    <td class="fw-medium">{{ $vehicle['plate_number'] }}</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            @if($vehicle['type'] == 'Truck')
-                                                <i class="bi bi-truck me-2 text-muted"></i>
-                                            @elseif($vehicle['type'] == 'Van')
-                                                <i class="bi bi-truck me-2 text-muted"></i>
-                                            @else
-                                                <i class="bi bi-car-front me-2 text-muted"></i>
-                                            @endif
-                                            {{ $vehicle['type'] }}
-                                        </div>
-                                    </td>
-                                    <td>{{ $vehicle['driver'] }}</td>
-                                    <td>
-                                        @if($vehicle['status'] == 'Active')
-                                            <span class="badge rounded-pill text-bg-success">Active</span>
-                                        @elseif($vehicle['status'] == 'Offline')
-                                            <span class="badge rounded-pill text-bg-danger">Offline</span>
-                                        @else
-                                            <span class="badge rounded-pill text-bg-warning">Maintenance</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $vehicle['location'] }}</td>
-                                    <td class="text-end pe-4">
-                                        <button type="button" class="btn btn-sm btn-info me-1" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#viewVehicleModal" 
-                                            data-bs-id="{{ $vehicle['id'] }}"
-                                            data-bs-plate="{{ $vehicle['plate_number'] }}"
-                                            data-bs-type="{{ $vehicle['type'] }}"
-                                            data-bs-driver="{{ $vehicle['driver'] }}"
-                                            data-bs-status="{{ $vehicle['status'] }}"
-                                            data-bs-location="{{ $vehicle['location'] }}">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-warning me-1" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#editVehicleModal"
-                                            data-bs-id="{{ $vehicle['id'] }}"
-                                            data-bs-plate="{{ $vehicle['plate_number'] }}"
-                                            data-bs-type="{{ $vehicle['type'] }}"
-                                            data-bs-driver="{{ $vehicle['driver'] }}"
-                                            data-bs-status="{{ $vehicle['status'] }}"
-                                            data-bs-location="{{ $vehicle['location'] }}">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-primary me-1" data-bs-toggle="tooltip" title="Track Live">
-                                            <i class="bi bi-geo-alt"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#deleteConfirmModal"
-                                            data-bs-id="{{ $vehicle['id'] }}"
-                                            data-bs-plate="{{ $vehicle['plate_number'] }}">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                        <div class="col-md-3">
+                            <label for="statusFilter" class="form-label">Status</label>
+                            <select class="form-select" id="statusFilter">
+                                <option value="">All Statuses</option>
+                                <option value="Active">Active</option>
+                                <option value="Offline">Offline</option>
+                                <option value="Maintenance">Maintenance</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="searchFilter" class="form-label">Search</label>
+                            <input type="text" class="form-control" id="searchFilter" placeholder="Search by ID, plate, or driver...">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" id="applyFilters">Apply Filters</button>
+                        </div>
                     </div>
                 </div>
-                <div class="card-footer bg-white border-0 py-3">
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center mb-0">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
+            </div>
+            
+            <!-- Vehicles Table -->
+            <div class="card border-0 shadow">
+                <div class="card-body" id="vehiclesTableContainer">
+                    @include('partials.vehicles-table')
                 </div>
             </div>
         </div>
@@ -284,71 +181,59 @@
 
     <!-- View Vehicle Modal -->
     <div class="modal fade" id="viewVehicleModal" tabindex="-1" aria-labelledby="viewVehicleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="viewVehicleModalLabel">Vehicle Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row g-4">
+                    <div class="row mb-3">
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <h6 class="text-muted small">VEHICLE ID</h6>
-                                <p class="mb-0 fw-medium" id="viewVehicleId"></p>
-                            </div>
-                            <div class="mb-3">
-                                <h6 class="text-muted small">PLATE NUMBER</h6>
-                                <p class="mb-0 fw-medium" id="viewPlateNumber"></p>
-                            </div>
-                            <div class="mb-3">
-                                <h6 class="text-muted small">VEHICLE TYPE</h6>
-                                <p class="mb-0" id="viewVehicleType"></p>
-                            </div>
-                            <div class="mb-3">
-                                <h6 class="text-muted small">ASSIGNED DRIVER</h6>
-                                <p class="mb-0" id="viewDriverName"></p>
-                            </div>
+                            <p class="text-muted mb-1">Vehicle ID</p>
+                            <p class="fw-bold mb-0" id="viewVehicleId"></p>
                         </div>
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <h6 class="text-muted small">STATUS</h6>
-                                <p class="mb-0" id="viewStatusContainer"></p>
-                            </div>
-                            <div class="mb-3">
-                                <h6 class="text-muted small">LAST KNOWN LOCATION</h6>
-                                <p class="mb-0" id="viewLastLocation"></p>
-                            </div>
-                            <div class="mb-3">
-                                <h6 class="text-muted small">LAST UPDATED</h6>
-                                <p class="mb-0 text-muted">Today at 10:23 AM</p>
-                            </div>
+                            <p class="text-muted mb-1">Plate Number</p>
+                            <p class="fw-bold mb-0" id="viewPlateNumber"></p>
                         </div>
-                        <div class="col-12">
-                            <div class="bg-light rounded p-3">
-                                <h6 class="mb-3">Recent Activity</h6>
-                                <div class="d-flex mb-2">
-                                    <div class="flex-shrink-0">
-                                        <div class="p-2 rounded-circle bg-success-subtle">
-                                            <i class="bi bi-check text-success small"></i>
-                                        </div>
-                                    </div>
-                                    <div class="ms-3">
-                                        <p class="mb-0 small">Started trip from Nairobi CBD to Westlands</p>
-                                        <p class="mb-0 small text-muted">Today at 08:15 AM</p>
-                                    </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Vehicle Type</p>
+                            <p class="fw-bold mb-0" id="viewVehicleType"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Driver</p>
+                            <p class="fw-bold mb-0" id="viewDriverName"></p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Status</p>
+                            <div id="viewStatusContainer"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Last Location</p>
+                            <p class="fw-bold mb-0" id="viewLastLocation"></p>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <h6 class="mb-3">Recent Activity</h6>
+                        <div class="list-group">
+                            <div class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">Location Update</h6>
+                                    <small>3 hours ago</small>
                                 </div>
-                                <div class="d-flex">
-                                    <div class="flex-shrink-0">
-                                        <div class="p-2 rounded-circle bg-primary-subtle">
-                                            <i class="bi bi-geo-alt text-primary small"></i>
-                                        </div>
-                                    </div>
-                                    <div class="ms-3">
-                                        <p class="mb-0 small">Completed maintenance check</p>
-                                        <p class="mb-0 small text-muted">Yesterday at 02:30 PM</p>
-                                    </div>
+                                <p class="mb-1">Vehicle reported location at New York, NY</p>
+                            </div>
+                            <div class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">Maintenance Check</h6>
+                                    <small>1 day ago</small>
                                 </div>
+                                <p class="mb-1">Completed maintenance check</p>
                             </div>
                         </div>
                     </div>
@@ -474,29 +359,59 @@
                 })
             }
             
-            // Save new vehicle
-            document.getElementById('saveNewVehicle').addEventListener('click', function() {
-                // Here you would normally submit the form via AJAX
-                // For demo purposes, we'll just close the modal and show a success message
-                const addModal = bootstrap.Modal.getInstance(document.getElementById('addVehicleModal'))
-                addModal.hide()
+            // AJAX form submission for adding a new vehicle
+            window.gpsAjax.submitFormAjax('addVehicleForm', '{{ url('vehicle/store') }}', function(data) {
+                // Refresh the vehicles table
+                window.gpsAjax.loadContent('{{ url('vehicles/table') }}', 'vehiclesTableContainer', function() {
+                    // Re-initialize tooltips after table refresh
+                    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+                    tooltipTriggerList.map(function (tooltipTriggerEl) {
+                        return new bootstrap.Tooltip(tooltipTriggerEl)
+                    });
+                });
                 
-                // Show success message (you could use a toast or alert)
-                alert('Vehicle added successfully!')
-            })
+                // Reset the form
+                document.getElementById('addVehicleForm').reset();
+            });
             
-            // Update vehicle
-            document.getElementById('updateVehicle').addEventListener('click', function() {
-                // Here you would normally submit the form via AJAX
-                // For demo purposes, we'll just close the modal and show a success message
-                const editModal = bootstrap.Modal.getInstance(document.getElementById('editVehicleModal'))
-                editModal.hide()
+            // AJAX form submission for editing a vehicle
+            window.gpsAjax.submitFormAjax('editVehicleForm', '{{ url('vehicle/update') }}', function(data) {
+                // Refresh the vehicles table
+                window.gpsAjax.loadContent('{{ url('vehicles/table') }}', 'vehiclesTableContainer', function() {
+                    // Re-initialize tooltips after table refresh
+                    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+                    tooltipTriggerList.map(function (tooltipTriggerEl) {
+                        return new bootstrap.Tooltip(tooltipTriggerEl)
+                    });
+                });
+            });
+            
+            // AJAX form submission for deleting a vehicle
+            document.getElementById('deleteVehicleForm').addEventListener('submit', function(e) {
+                e.preventDefault();
                 
-                // Show success message (you could use a toast or alert)
-                alert('Vehicle updated successfully!')
-            })
+                const form = this;
+                const url = form.getAttribute('action');
+                
+                window.gpsAjax.performAction(url, 'DELETE', {}, function(data) {
+                    // Close the modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+                    modal.hide();
+                    
+                    // Refresh the vehicles table
+                    window.gpsAjax.loadContent('{{ url('vehicles/table') }}', 'vehiclesTableContainer', function() {
+                        // Re-initialize tooltips after table refresh
+                        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+                        tooltipTriggerList.map(function (tooltipTriggerEl) {
+                            return new bootstrap.Tooltip(tooltipTriggerEl)
+                        });
+                    });
+                });
+            });
         });
     </script>
 </x-app-layout>
+
+
 
 

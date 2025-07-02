@@ -158,13 +158,13 @@
                             </a>
                         </li>
                         <li class="nav-item mb-2">
-                            <a href="#" class="nav-link px-3 py-2 rounded {{ request()->routeIs('alerts') ? 'text-white bg-primary' : 'text-dark' }}">
+                            <a href="{{ url('alerts/index') }}" class="nav-link px-3 py-2 rounded {{ request()->is('alerts/*') ? 'text-white bg-primary' : 'text-dark' }}">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
                                 {{ __('Alerts') }}
                             </a>
                         </li>
                         <li class="nav-item mb-2">
-                            <a href="#" class="nav-link px-3 py-2 rounded {{ request()->routeIs('settings') ? 'text-white bg-primary' : 'text-dark' }}">
+                            <a href="{{ url('settings/index') }}" class="nav-link px-3 py-2 rounded {{ request()->is('settings/*') ? 'text-white bg-primary' : 'text-dark' }}">
                                 <i class="bi bi-gear me-2"></i>
                                 {{ __('Settings') }}
                             </a>
@@ -309,6 +309,11 @@
         @livewireScripts
     </body>
 </html>
+
+
+
+
+
 
 
 
