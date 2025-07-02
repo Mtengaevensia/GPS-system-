@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+
+/* Bootstrap 5 overrides and custom styles */
+.bg-indigo-100 {
+    background-color: rgba(79, 70, 229, 0.1);
+}
+
+.text-indigo {
+    color: #4F46E5;
+}
+
+.bg-indigo {
+    background-color: #4F46E5;
+}
+
+/* Fix for sidebar and main content layout */
+@media (min-width: 992px) {
+    #content {
+        margin-left: 250px;
+        width: calc(100% - 250px);
+    }
+    
+    #sidebar {
+        margin-left: 0;
+    }
+}
+
+/* Ensure content doesn't overlap with sidebar on mobile */
+@media (max-width: 991.98px) {
+    #content {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    #sidebar {
+        margin-left: -250px;
+    }
+    
+    #sidebar.active {
+        margin-left: 0;
+    }
+}
+
+/* Custom scrollbar for sidebar */
+#sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+#sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+#sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+/* Dark mode adjustments */
+[data-bs-theme="dark"] .card {
+    background-color: #1F2937;
+    border-color: #374151;
+}
+
+[data-bs-theme="dark"] .bg-white,
+[data-bs-theme="dark"] .bg-light {
+    background-color: #1F2937 !important;
+}
+
+
+
