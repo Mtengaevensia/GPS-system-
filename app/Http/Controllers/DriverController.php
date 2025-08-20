@@ -4,69 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Models\Driver;
 
 class DriverController extends Controller
 {
     /**
      * Display a listing of the drivers.
      */
-    public function index(): View
+    public function index()
     {
-        // In a real application, you would fetch drivers from the database
-        // For now, we'll use static sample data
-        $drivers = [
-            [
-                'id' => 1,
-                'name' => 'John Doe',
-                'license_number' => 'DL-12345678',
-                'phone' => '+254 712 345 678',
-                'email' => 'john.doe@example.com',
-                'status' => 'Active',
-                'address' => 'Nairobi CBD, Moi Avenue',
-                'joined_date' => '2022-03-15'
-            ],
-            [
-                'id' => 2,
-                'name' => 'Jane Smith',
-                'license_number' => 'DL-87654321',
-                'phone' => '+254 723 456 789',
-                'email' => 'jane.smith@example.com',
-                'status' => 'Inactive',
-                'address' => 'Westlands, Waiyaki Way',
-                'joined_date' => '2022-05-20'
-            ],
-            [
-                'id' => 3,
-                'name' => 'Robert Johnson',
-                'license_number' => 'DL-23456789',
-                'phone' => '+254 734 567 890',
-                'email' => 'robert.johnson@example.com',
-                'status' => 'Active',
-                'address' => 'Karen, Ngong Road',
-                'joined_date' => '2021-11-10'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Michael Brown',
-                'license_number' => 'DL-34567890',
-                'phone' => '+254 745 678 901',
-                'email' => 'michael.brown@example.com',
-                'status' => 'Active',
-                'address' => 'Mombasa Road, Syokimau',
-                'joined_date' => '2023-01-05'
-            ],
-            [
-                'id' => 5,
-                'name' => 'Sarah Williams',
-                'license_number' => 'DL-45678901',
-                'phone' => '+254 756 789 012',
-                'email' => 'sarah.williams@example.com',
-                'status' => 'Inactive',
-                'address' => 'Thika Road, Garden City',
-                'joined_date' => '2022-08-15'
-            ]
-        ];
-
+    
+        $drivers = \App\Models\Driver::all();
         return view('drivers', ['drivers' => $drivers]);
     }
 
@@ -83,8 +31,26 @@ class DriverController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate and store the driver
-        // Redirect to drivers index with success message
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'license_number' => 'required|string|max:255|unique:drivers,license_number',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'address' => 'nullable|string|max:255',
+            'status' => 'required|string|max:50',
+            'joined_date' => 'required|date',
+        ]);
+        \App\Models\Driver::create([
+            'name' => $request->input('name'),
+            'license_number' => $request->input('license_number'),
+            'phone' => $request->input('phone'),
+            'email' => $request->input('email'),
+            'address' => $request->input('address'),
+            'status' => $request->input('status'),
+            'joined_date' => $request->input('joined_date'),
+
+        ]);
+
         return redirect()->to('driver/index')->with('success', 'Driver created successfully');
     }
 
@@ -121,10 +87,17 @@ class DriverController extends Controller
     /**
      * Remove the specified driver from storage.
      */
-    public function destroy(string $id)
-    {
-        // Delete the driver
-        // Redirect to drivers index with success message
-        return redirect()->to('driver/index')->with('success', 'Driver deleted successfully');
-    }
+   public function destroy(Request $request)
+{
+    $validated = $request->validate([
+        'id' => 'required|exists:drivers,id',
+    ]);
+
+    $driver = Driver::findOrFail($validated['id']);
+    $driver->delete();
+
+    return redirect()->back()->with('success', 'Driver deleted successfully');
+}
+
+
 }

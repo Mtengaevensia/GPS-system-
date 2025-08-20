@@ -5,6 +5,105 @@
         </h2>
     </x-slot>
 
+
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-4 auto-dismiss" style="z-index: 1055; min-width: 300px;" role="alert">
+            {{ session('success') }}
+            <div class="progress mt-2" style="height: 3px;">
+                <div class="progress-bar bg-success" id="successProgressBar" style="width: 100%; transition: width 0.1s linear;"></div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-4 auto-dismiss" style="z-index: 1055; min-width: 300px;" role="alert">
+            {{ session('error') }}
+            <div class="progress mt-2" style="height: 3px;">
+                <div class="progress-bar bg-danger" id="errorProgressBar" style="width: 100%; transition: width 0.1s linear;"></div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show mt-4 mx-4 auto-dismiss" role="alert">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const duration = 4000; // ms
+            document.querySelectorAll('.auto-dismiss').forEach(function (el) {
+                let progressBar = el.querySelector('.progress-bar');
+                let paused = false;
+                let start = Date.now();
+                let elapsed = 0;
+                let timer;
+
+                function updateBar() {
+                    if (!paused) {
+                        elapsed = Date.now() - start;
+                        let percent = Math.max(0, 100 - (elapsed / duration) * 100);
+                        if (progressBar) progressBar.style.width = percent + '%';
+                        if (percent <= 0) {
+                            clearInterval(timer);
+                            el.classList.remove('show');
+                            setTimeout(function () {
+                                el.remove();
+                            }, 500);
+                        }
+                    }
+                }
+
+                function startTimer() {
+                    timer = setInterval(updateBar, 50);
+                }
+
+                function pauseTimer() {
+                    paused = true;
+                }
+
+                function resumeTimer() {
+                    paused = false;
+                    start = Date.now() - elapsed;
+                }
+
+                el.addEventListener('mouseenter', pauseTimer);
+                el.addEventListener('mouseleave', resumeTimer);
+
+                if (progressBar) {
+                    startTimer();
+                } else {
+                    timer = setTimeout(function () {
+                        el.classList.remove('show');
+                        setTimeout(function () {
+                            el.remove();
+                        }, 500);
+                    }, duration);
+                    el.addEventListener('mouseenter', function () {
+                        clearTimeout(timer);
+                    });
+                    el.addEventListener('mouseleave', function () {
+                        timer = setTimeout(function () {
+                            el.classList.remove('show');
+                            setTimeout(function () {
+                                el.remove();
+                            }, 500);
+                        }, duration - elapsed);
+                    });
+                }
+            });
+        });
+    </script>
+
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Page Header -->
@@ -80,39 +179,20 @@
                                         @endif
                                     </td>
                                     <td class="text-end pe-4">
-                                        <button type="button" class="btn btn-sm btn-info me-1" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#viewDriverModal" 
-                                            data-bs-id="{{ $driver['id'] }}"
-                                            data-bs-name="{{ $driver['name'] }}"
-                                            data-bs-license="{{ $driver['license_number'] }}"
-                                            data-bs-phone="{{ $driver['phone'] }}"
-                                            data-bs-email="{{ $driver['email'] }}"
-                                            data-bs-status="{{ $driver['status'] }}"
-                                            data-bs-address="{{ $driver['address'] }}"
-                                            data-bs-joined="{{ $driver['joined_date'] }}">
+                                        <button type="button" class="btn btn-sm btn-info me-1" >
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-warning me-1" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#editDriverModal"
-                                            data-bs-id="{{ $driver['id'] }}"
-                                            data-bs-name="{{ $driver['name'] }}"
-                                            data-bs-license="{{ $driver['license_number'] }}"
-                                            data-bs-phone="{{ $driver['phone'] }}"
-                                            data-bs-email="{{ $driver['email'] }}"
-                                            data-bs-status="{{ $driver['status'] }}"
-                                            data-bs-address="{{ $driver['address'] }}"
-                                            data-bs-joined="{{ $driver['joined_date'] }}">
+                                        <button type="button" class="btn btn-sm btn-warning me-1">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-danger" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#deleteConfirmModal"
-                                            data-bs-id="{{ $driver['id'] }}"
-                                            data-bs-name="{{ $driver['name'] }}">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger"
+    data-bs-toggle="modal"
+    data-bs-target="#deleteConfirmModal"
+    data-driver-id="{{ $driver->id }}"
+    data-driver-name="{{ $driver->name }}">
+    <i class="bi bi-trash"></i>
+</button>
+
                                     </td>
                                 </tr>
                                 @endforeach
@@ -183,12 +263,13 @@
                                 <textarea class="form-control" id="address" name="address" rows="2"></textarea>
                             </div>
                         </div>
+                        <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveNewDriver">Save Driver</button>
+                </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="saveNewDriver">Save Driver</button>
-                </div>
+                
             </div>
         </div>
     </div>
@@ -347,9 +428,10 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <form id="deleteDriverForm" action="" method="POST" class="d-inline">
-                        @csrf
-                        @method('DELETE')
+                            <form action="{{ url('driver/destroy') }}" method="POST" class="d-inline">
+            @csrf
+            @method('DELETE')
+                        <input type="hidden" name="id" id="deleteDriverId" value="{{ $driver->id }}">
                         <button type="submit" class="btn btn-danger">Delete Driver</button>
                     </form>
                 </div>
@@ -357,125 +439,20 @@
         </div>
     </div>
 
-    <!-- Initialize tooltips and modals -->
+   
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize all tooltips
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            });
-            
-            // View Driver Modal
-            const viewDriverModal = document.getElementById('viewDriverModal')
-            if (viewDriverModal) {
-                viewDriverModal.addEventListener('show.bs.modal', event => {
-                    // Button that triggered the modal
-                    const button = event.relatedTarget
-                    
-                    // Extract info from data-bs-* attributes
-                    const id = button.getAttribute('data-bs-id')
-                    const name = button.getAttribute('data-bs-name')
-                    const license = button.getAttribute('data-bs-license')
-                    const phone = button.getAttribute('data-bs-phone')
-                    const email = button.getAttribute('data-bs-email')
-                    const status = button.getAttribute('data-bs-status')
-                    const address = button.getAttribute('data-bs-address')
-                    const joined = button.getAttribute('data-bs-joined')
-                    
-                    // Update the modal's content
-                    document.getElementById('viewDriverId').textContent = id
-                    document.getElementById('viewFullName').textContent = name
-                    document.getElementById('viewLicenseNumber').textContent = license
-                    document.getElementById('viewPhoneNumber').textContent = phone
-                    document.getElementById('viewEmailAddress').textContent = email
-                    document.getElementById('viewAddress').textContent = address
-                    document.getElementById('viewJoinedDate').textContent = joined
-                    
-                    // Status badge
-                    const statusContainer = document.getElementById('viewStatusContainer')
-                    let badgeClass = 'badge rounded-pill '
-                    
-                    if (status === 'Active') {
-                        badgeClass += 'text-bg-success'
-                    } else {
-                        badgeClass += 'text-bg-danger'
-                    }
-                    
-                    statusContainer.innerHTML = `<span class="${badgeClass}">${status}</span>`
-                })
-            }
-            
-            // Edit Driver Modal
-            const editDriverModal = document.getElementById('editDriverModal')
-            if (editDriverModal) {
-                editDriverModal.addEventListener('show.bs.modal', event => {
-                    // Button that triggered the modal
-                    const button = event.relatedTarget
-                    
-                    // Extract info from data-bs-* attributes
-                    const id = button.getAttribute('data-bs-id')
-                    const name = button.getAttribute('data-bs-name')
-                    const license = button.getAttribute('data-bs-license')
-                    const phone = button.getAttribute('data-bs-phone')
-                    const email = button.getAttribute('data-bs-email')
-                    const status = button.getAttribute('data-bs-status')
-                    const address = button.getAttribute('data-bs-address')
-                    const joined = button.getAttribute('data-bs-joined')
-                    
-                    // Update the modal's content
-                    document.getElementById('editDriverId').value = id
-                    document.getElementById('editFullName').value = name
-                    document.getElementById('editLicenseNumber').value = license
-                    document.getElementById('editPhoneNumber').value = phone
-                    document.getElementById('editEmailAddress').value = email
-                    document.getElementById('editDriverStatus').value = status
-                    document.getElementById('editAddress').value = address
-                    document.getElementById('editJoinedDate').value = joined
-                    
-                    // Update form action
-                    document.getElementById('editDriverForm').action = `{{ url('driver/update') }}/${id}`
-                })
-            }
-            
-            // Delete Confirmation Modal
-            const deleteConfirmModal = document.getElementById('deleteConfirmModal')
-            if (deleteConfirmModal) {
-                deleteConfirmModal.addEventListener('show.bs.modal', event => {
-                    // Button that triggered the modal
-                    const button = event.relatedTarget
-                    
-                    // Extract info from data-bs-* attributes
-                    const id = button.getAttribute('data-bs-id')
-                    const name = button.getAttribute('data-bs-name')
-                    
-                    // Update the modal's content
-                    document.getElementById('deleteDriverName').textContent = name
-                    document.getElementById('deleteDriverForm').action = `{{ url('driver/destroy') }}/${id}`
-                })
-            }
-            
-            // Save new driver
-            document.getElementById('saveNewDriver').addEventListener('click', function() {
-                // Here you would normally submit the form via AJAX
-                // For demo purposes, we'll just close the modal and show a success message
-                const addModal = bootstrap.Modal.getInstance(document.getElementById('addDriverModal'))
-                addModal.hide()
-                
-                // Show success message (you could use a toast or alert)
-                alert('Driver added successfully!')
-            })
-            
-            // Update driver
-            document.getElementById('updateDriver').addEventListener('click', function() {
-                // Here you would normally submit the form via AJAX
-                // For demo purposes, we'll just close the modal and show a success message
-                const editModal = bootstrap.Modal.getInstance(document.getElementById('editDriverModal'))
-                editModal.hide()
-                
-                // Show success message (you could use a toast or alert)
-                alert('Driver updated successfully!')
-            })
-        });
-    </script>
+document.addEventListener('DOMContentLoaded', function () {
+    const deleteModal = document.getElementById('deleteConfirmModal');
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget; // Button that triggered the modal
+        const driverId = button.getAttribute('data-driver-id');
+        const driverName = button.getAttribute('data-driver-name');
+
+        // Update hidden input & driver name
+        document.getElementById('deleteDriverId').value = driverId;
+        document.getElementById('deleteDriverName').textContent = driverName;
+    });
+});
+</script>
+
 </x-app-layout>
