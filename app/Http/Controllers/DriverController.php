@@ -13,7 +13,7 @@ class DriverController extends Controller
      */
     public function index()
     {
-    
+
         $drivers = \App\Models\Driver::all();
         return view('drivers', ['drivers' => $drivers]);
     }
@@ -31,73 +31,155 @@ class DriverController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        dd($request->all());
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'license_number' => 'required|string|max:255|unique:drivers,license_number',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
+            'license_number' => 'required|string|max:50',
+            'phone' => 'required|string|max:20',
+            'status' => 'required|in:Active,Inactive',
+            'email' => 'nullable|email',
+            'joined_date' => 'nullable|date',
             'address' => 'nullable|string|max:255',
-            'status' => 'required|string|max:50',
-            'joined_date' => 'required|date',
-        ]);
-        \App\Models\Driver::create([
-            'name' => $request->input('name'),
-            'license_number' => $request->input('license_number'),
-            'phone' => $request->input('phone'),
-            'email' => $request->input('email'),
-            'address' => $request->input('address'),
-            'status' => $request->input('status'),
-            'joined_date' => $request->input('joined_date'),
-
         ]);
 
-        return redirect()->to('driver/index')->with('success', 'Driver created successfully');
+        try {
+            $driver = Driver::create($validated);
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Driver created successfully',
+                'driver' => $driver
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Failed to create driver: ' . $e->getMessage()
+            ]);
+        }
     }
 
-    /**
-     * Display the specified driver.
-     */
-    public function show(string $id): View
-    {
-        // Find the driver by ID
-        // Return the driver details view
-        return view('drivers.show', ['id' => $id]);
+public function show()
+{
+    // Get the ID from the URL segments
+    $segments = request()->segments();
+    $id = end($segments); // Gets the last segment
+    
+    
+    $driver = Driver::find($id);
+
+    if (!$driver) {
+        return response()->json(['error' => 'Driver not found'], 404);
     }
 
-    /**
-     * Show the form for editing the specified driver.
-     */
-    public function edit(string $id): View
-    {
-        // Find the driver by ID
-        // Return the edit form
-        return view('drivers.edit', ['id' => $id]);
+    return response()->json($driver);
+}
+
+    public function update($id = null)
+{
+    // Handle dynamic routing parameter extraction
+    if (is_array($id)) {
+        $id = $id[0] ?? null;
+    }
+    
+    if (!$id) {
+        $segments = request()->segments();
+        $id = end($segments);
     }
 
-    /**
-     * Update the specified driver in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        // Validate and update the driver
-        // Redirect to drivers index with success message
-        return redirect()->to('driver/index')->with('success', 'Driver updated successfully');
+    // Find the driver
+    $driver = Driver::find($id);
+    
+    if (!$driver) {
+        return response()->json([
+            'status' => 404,
+            'message' => 'Driver not found'
+        ], 404);
     }
+
+    // Validate the request
+    $validated = request()->validate([
+        'name' => 'required|string|max:255',
+        'license_number' => 'required|string|max:50',
+        'phone' => 'required|string|max:20',
+        'status' => 'required|in:Active,Inactive',
+        'email' => 'nullable|email',
+        'joined_date' => 'nullable|date',
+        'address' => 'nullable|string|max:255',
+    ]);
+
+    try {
+        $driver->update($validated);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Driver updated successfully',
+            'driver' => $driver->fresh() // Get updated data
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 500,
+            'message' => 'Failed to update driver: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
 
     /**
      * Remove the specified driver from storage.
      */
-   public function destroy(Request $request)
+   public function destroy($id = null)
 {
-    $validated = $request->validate([
-        'id' => 'required|exists:drivers,id',
-    ]);
+    // Handle dynamic routing parameter extraction
+    if (is_array($id)) {
+        $id = $id[0] ?? null;
+    }
+    
+    if (!$id) {
+        $segments = request()->segments();
+        $id = end($segments);
+    }
 
-    $driver = Driver::findOrFail($validated['id']);
-    $driver->delete();
+    if (!$id) {
+        if (request()->ajax()) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Driver ID is required'
+            ], 400);
+        }
+        return redirect()->back()->with('error', 'Driver ID is required');
+    }
 
-    return redirect()->back()->with('success', 'Driver deleted successfully');
+    try {
+        $driver = Driver::findOrFail($id);
+        $driver->delete();
+
+        // Check if it's an AJAX request
+        if (request()->ajax()) {
+            return response()->json([
+                'status' => 200,
+                'message' => 'Driver deleted successfully'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Driver deleted successfully');
+        
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        if (request()->ajax()) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Driver not found'
+            ], 404);
+        }
+        return redirect()->back()->with('error', 'Driver not found');
+        
+    } catch (\Exception $e) {
+        if (request()->ajax()) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Failed to delete driver: ' . $e->getMessage()
+            ], 500);
+        }
+        return redirect()->back()->with('error', 'Failed to delete driver');
+    }
 }
-
-
 }

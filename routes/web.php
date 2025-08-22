@@ -31,9 +31,18 @@ Route::any('{controller}/{method}/{params?}', function ($controller, $method, $p
         abort(404, "Method [$method] not found in [$controllerClass].");
     }
 
-    $params = $params ? explode('/', $params) : [];
+    // Better parameter handling
+    $paramArray = [];
+    if ($params) {
+        $paramArray = explode('/', $params);
+        // Remove empty values
+        $paramArray = array_filter($paramArray);
+        // Reindex array
+        $paramArray = array_values($paramArray);
+    }
 
-    return app()->call([$controllerInstance, $method], $params);
+    // Call the method with proper parameters
+    return call_user_func_array([$controllerInstance, $method], $paramArray);
+    
 })->where('params', '.*');
-
 
