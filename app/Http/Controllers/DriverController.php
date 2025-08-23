@@ -14,7 +14,8 @@ class DriverController extends Controller
     public function index()
     {
 
-        $drivers = \App\Models\Driver::all();
+        $drivers = Driver::paginate(5);
+
         return view('drivers', ['drivers' => $drivers]);
     }
 

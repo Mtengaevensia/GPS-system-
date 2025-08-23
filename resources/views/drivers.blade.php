@@ -105,30 +105,19 @@
                                 @endforeach
                             </tbody>
                         </table>
+
                     </div>
                 </div>
-                <div class="card-footer bg-white border-0 py-3">
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center mb-0">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
+
+                <div class="d-flex justify-content-center mt-3 mb-4">
+                    {!! $drivers->withQueryString()->links('pagination::bootstrap-5') !!}
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Add Driver Modal -->
-    <div class="modal fade" id="addDriverModal" tabindex="-1" aria-labelledby="addDriverModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="addDriverModal" tabindex="-1" aria-labelledby="addDriverModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -571,97 +560,98 @@
 
         // SUBMIT EDIT FORM
         $(document).on('submit', '#editDriverForm', function(e) {
-    e.preventDefault();
-    e.stopPropagation(); // Prevent event bubbling
+            e.preventDefault();
+            e.stopPropagation(); // Prevent event bubbling
 
-    console.log('Edit form submitted via AJAX');
+            console.log('Edit form submitted via AJAX');
 
-    const driverId = $('#editDriverId').val();
-    
-    if (!driverId) {
-        showAlert('Driver ID not found!', 'danger');
-        return false;
-    }
+            const driverId = $('#editDriverId').val();
 
-    const formData = $(this).serialize();
-    const $submitBtn = $(this).find('button[type="submit"]');
-    const originalBtnText = $submitBtn.html();
-
-    // Show loading state
-    $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Updating...');
-
-    $.ajax({
-        url: "{{ url('driver/update') }}/" + driverId,
-        method: 'POST',
-        data: formData + '&_method=PUT&_token={{ csrf_token() }}',
-        dataType: 'json', // Expect JSON response
-        success: function(response) {
-            console.log('Update success:', response);
-            
-            if (response.status === 200) {
-                showAlert(response.message, 'success');
-                $('#editDriverModal').modal('hide');
-                
-                // Fix modal backdrop issue
-                setTimeout(function() {
-                    $('.modal-backdrop').remove();
-                    $('body').removeClass('modal-open').css('padding-right', '');
-                }, 100);
-                
-                // Update the table row instead of reloading
-                updateTableRow(driverId, response.driver);
-                
-            } else {
-                showAlert(response.message || 'Failed to update driver', 'danger');
+            if (!driverId) {
+                showAlert('Driver ID not found!', 'danger');
+                return false;
             }
-        },
-        error: function(xhr) {
-            console.error('Update error:', xhr);
-            
-            let message = 'Failed to update driver';
-            
-            if (xhr.responseJSON) {
-                if (xhr.responseJSON.message) {
-                    message = xhr.responseJSON.message;
-                } else if (xhr.responseJSON.errors) {
-                    const errors = xhr.responseJSON.errors;
-                    message = Object.values(errors).flat().join('<br>');
+
+            const formData = $(this).serialize();
+            const $submitBtn = $(this).find('button[type="submit"]');
+            const originalBtnText = $submitBtn.html();
+
+            // Show loading state
+            $submitBtn.prop('disabled', true).html(
+                '<span class="spinner-border spinner-border-sm"></span> Updating...');
+
+            $.ajax({
+                url: "{{ url('driver/update') }}/" + driverId,
+                method: 'POST',
+                data: formData + '&_method=PUT&_token={{ csrf_token() }}',
+                dataType: 'json', // Expect JSON response
+                success: function(response) {
+                    console.log('Update success:', response);
+
+                    if (response.status === 200) {
+                        showAlert(response.message, 'success');
+                        $('#editDriverModal').modal('hide');
+
+                        // Fix modal backdrop issue
+                        setTimeout(function() {
+                            $('.modal-backdrop').remove();
+                            $('body').removeClass('modal-open').css('padding-right', '');
+                        }, 100);
+
+                        // Update the table row instead of reloading
+                        updateTableRow(driverId, response.driver);
+
+                    } else {
+                        showAlert(response.message || 'Failed to update driver', 'danger');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Update error:', xhr);
+
+                    let message = 'Failed to update driver';
+
+                    if (xhr.responseJSON) {
+                        if (xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        } else if (xhr.responseJSON.errors) {
+                            const errors = xhr.responseJSON.errors;
+                            message = Object.values(errors).flat().join('<br>');
+                        }
+                    }
+
+                    showAlert(message, 'danger');
+                },
+                complete: function() {
+                    // Reset button state
+                    $submitBtn.prop('disabled', false).html(originalBtnText);
                 }
+            });
+
+            return false; // Prevent any default form submission
+        });
+
+        // Function to update table row without page reload
+        function updateTableRow(driverId, driver) {
+            const $row = $(`button[data-driver-id="${driverId}"]`).closest('tr');
+
+            if ($row.length > 0) {
+                const statusBadge = driver.status === 'Active' ?
+                    '<span class="badge rounded-pill text-bg-success">Active</span>' :
+                    '<span class="badge rounded-pill text-bg-danger">Inactive</span>';
+
+                // Update table cells (adjust column indices based on your table structure)
+                $row.find('td').eq(1).text(driver.name); // Name column
+                $row.find('td').eq(2).text(driver.license_number); // License column
+                $row.find('td').eq(3).text(driver.phone); // Phone column
+                $row.find('td').eq(4).html(statusBadge); // Status column
+
+                // Add a brief highlight effect
+                $row.addClass('table-success');
+                setTimeout(function() {
+                    $row.removeClass('table-success');
+                }, 2000);
             }
-            
-            showAlert(message, 'danger');
-        },
-        complete: function() {
-            // Reset button state
-            $submitBtn.prop('disabled', false).html(originalBtnText);
         }
-    });
-
-    return false; // Prevent any default form submission
-});
-
-// Function to update table row without page reload
-function updateTableRow(driverId, driver) {
-    const $row = $(`button[data-driver-id="${driverId}"]`).closest('tr');
-    
-    if ($row.length > 0) {
-        const statusBadge = driver.status === 'Active' ?
-            '<span class="badge rounded-pill text-bg-success">Active</span>' :
-            '<span class="badge rounded-pill text-bg-danger">Inactive</span>';
-        
-        // Update table cells (adjust column indices based on your table structure)
-        $row.find('td').eq(1).text(driver.name); // Name column
-        $row.find('td').eq(2).text(driver.license_number); // License column
-        $row.find('td').eq(3).text(driver.phone); // Phone column
-        $row.find('td').eq(4).html(statusBadge); // Status column
-        
-        // Add a brief highlight effect
-        $row.addClass('table-success');
-        setTimeout(function() {
-            $row.removeClass('table-success');
-        }, 2000);
-    }
-}
 
 
 
