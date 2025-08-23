@@ -31,18 +31,15 @@ Route::any('{controller}/{method}/{params?}', function ($controller, $method, $p
         abort(404, "Method [$method] not found in [$controllerClass].");
     }
 
-    // Better parameter handling
-    $paramArray = [];
-    if ($params) {
-        $paramArray = explode('/', $params);
-        // Remove empty values
-        $paramArray = array_filter($paramArray);
-        // Reindex array
-        $paramArray = array_values($paramArray);
+    // Handle different methods that need Request object
+    if (in_array($method, ['store', 'update'])) {
+        // For store and update methods, pass the Request object
+        return app()->call([$controllerInstance, $method], [request()]);
+    } else {
+        // For other methods, handle parameters normally
+        $paramArray = $params ? explode('/', $params) : [];
+        return call_user_func_array([$controllerInstance, $method], $paramArray);
     }
-
-    // Call the method with proper parameters
-    return call_user_func_array([$controllerInstance, $method], $paramArray);
     
 })->where('params', '.*');
 

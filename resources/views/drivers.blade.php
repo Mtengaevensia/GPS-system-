@@ -83,9 +83,9 @@
                                             @endif
                                         </td>
                                         <td class="text-end pe-4">
-                                            <button type="button" class="btn btn-sm btn-info me-1"
+                                            <button type="button" class="btn btn-sm btn-info me-1 btn-view-driver"
                                                 data-bs-target="#viewDriverModal" data-bs-toggle="modal"
-                                                data-driver-id="{{ $driver->id }}" onclick="viewDriver(this)">
+                                                data-driver-id="{{ $driver->id }}">
                                                 <i class="bi bi-eye"></i>
                                             </button>
                                             <button type="button" class="btn btn-sm btn-warning me-1 btn-edit-driver"
@@ -135,8 +135,8 @@
                     <h5 class="modal-title" id="addDriverModalLabel">Add New Driver</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="addDriverForm">
+                <form id="addDriverForm">
+                    <div class="modal-body">
                         @csrf
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -154,8 +154,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="emailAddress" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="emailAddress" name="email"
-                                    required>
+                                <input type="email" class="form-control" id="emailAddress" name="email">
                             </div>
                             <div class="col-md-6">
                                 <label for="driverStatus" class="form-label">Status</label>
@@ -173,13 +172,12 @@
                                 <textarea class="form-control" id="address" name="address" rows="2"></textarea>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary" id="saveNewDriver">Save Driver</button>
-                        </div>
-                    </form>
-                </div>
-
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="saveNewDriver">Save Driver</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -338,29 +336,29 @@
     </div>
 
 
-   <!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteConfirmModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Delete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete driver <span id="deleteDriverName" class="fw-bold"></span>?</p>
-                <p class="text-danger mb-0">This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <!-- Add this hidden input -->
-                <input type="hidden" id="deleteDriverId" value="">
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
-                    <i class="bi bi-trash"></i> Delete Driver
-                </button>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete driver?</p>
+                    <p class="text-danger mb-0">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <!-- Add this hidden input -->
+                    <input type="hidden" id="deleteDriverId" value="">
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                        <i class="bi bi-trash"></i> Delete Driver
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -430,9 +428,16 @@
         }
 
         // AJAX form submission
+        // AJAX form submission for adding driver
         $(document).on('submit', '#addDriverForm', function(e) {
             e.preventDefault();
+
             let formData = new FormData(this);
+            const $submitBtn = $('#saveNewDriver');
+
+            // Show loading state
+            $submitBtn.prop('disabled', true).html(
+                '<span class="spinner-border spinner-border-sm"></span> Saving...');
 
             $.ajax({
                 type: "POST",
@@ -444,12 +449,16 @@
                     if (response.status === 200) {
                         $('#addDriverModal').modal('hide');
                         $('#addDriverForm')[0].reset();
-                        $('.modal-backdrop').remove();
-                        $('body').removeClass('modal-open');
+
+                        // Fix modal backdrop
+                        $('.modal-backdrop').fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                        $('body').removeClass('modal-open').css('padding-right', '');
 
                         showAlert(response.message, 'success');
 
-                        // Append new driver to table
+                        // Append new driver to table with proper data attributes
                         let driver = response.driver;
                         let statusBadge = driver.status === 'Active' ?
                             '<span class="badge rounded-pill text-bg-success">Active</span>' :
@@ -463,13 +472,27 @@
                         <td>${driver.phone}</td>
                         <td>${statusBadge}</td>
                         <td class="text-end pe-4">
-                            <button class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></button>
-                            <button class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></button>
-                            <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                            <button type="button" class="btn btn-sm btn-info me-1 btn-view-driver"
+                                    data-bs-target="#viewDriverModal" data-bs-toggle="modal"
+                                    data-driver-id="${driver.id}">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-warning me-1 btn-edit-driver"
+                                    data-bs-target="#editDriverModal" data-bs-toggle="modal"
+                                    data-driver-id="${driver.id}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger btn-delete-driver" 
+                                    data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
+                                    data-driver-id="${driver.id}">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </td>
                     </tr>
                 `;
                         $('#myTable tbody').append(newRow);
+
+                        // Scroll to new row
                         $('#myTable').parent().scrollTop($('#myTable').parent()[0].scrollHeight);
 
                     } else {
@@ -477,16 +500,30 @@
                     }
                 },
                 error: function(xhr) {
-                    let errors = xhr.responseJSON?.errors;
-                    if (errors) {
-                        let messages = Object.values(errors).flat().join('<br>');
-                        showAlert(messages, 'danger');
-                    } else {
-                        showAlert('An unexpected error occurred', 'danger');
+                    console.error('Add driver error:', xhr);
+                    let message = 'An unexpected error occurred';
+
+                    if (xhr.responseJSON?.errors) {
+                        let errors = xhr.responseJSON.errors;
+                        message = Object.values(errors).flat().join('<br>');
+                    } else if (xhr.responseJSON?.message) {
+                        message = xhr.responseJSON.message;
                     }
+
+                    showAlert(message, 'danger');
+                },
+                complete: function() {
+                    // Reset button state
+                    $submitBtn.prop('disabled', false).html('Save Driver');
                 }
             });
         });
+
+        function updateRowNumbers() {
+            $('#myTable tbody tr').each(function(index) {
+                $(this).find('td:first').text(index + 1);
+            });
+        }
 
 
 
@@ -534,36 +571,97 @@
 
         // SUBMIT EDIT FORM
         $(document).on('submit', '#editDriverForm', function(e) {
-            e.preventDefault();
+    e.preventDefault();
+    e.stopPropagation(); // Prevent event bubbling
 
-            const driverId = $('#editDriverId').val();
-            const formData = $(this).serialize();
+    console.log('Edit form submitted via AJAX');
 
-            $.ajax({
-                url: "{{ url('driver/update') }}/" + driverId,
-                method: 'POST', // or PUT if you prefer
-                data: formData + '&_method=PUT', // Add method spoofing if using PUT
-                success: function(response) {
-                    if (response.status === 200) {
-                        showAlert(response.message, 'success');
-                        $('#editDriverModal').modal('hide');
-                        // Optionally reload the page or update the table
-                        location.reload();
-                    } else {
-                        showAlert(response.message, 'danger');
-                    }
-                },
-                error: function(xhr) {
-                    const response = xhr.responseJSON;
-                    if (response && response.message) {
-                        showAlert(response.message, 'danger');
-                    } else {
-                        showAlert('Failed to update driver', 'danger');
-                    }
-                    console.error('Error response:', xhr.responseText);
+    const driverId = $('#editDriverId').val();
+    
+    if (!driverId) {
+        showAlert('Driver ID not found!', 'danger');
+        return false;
+    }
+
+    const formData = $(this).serialize();
+    const $submitBtn = $(this).find('button[type="submit"]');
+    const originalBtnText = $submitBtn.html();
+
+    // Show loading state
+    $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Updating...');
+
+    $.ajax({
+        url: "{{ url('driver/update') }}/" + driverId,
+        method: 'POST',
+        data: formData + '&_method=PUT&_token={{ csrf_token() }}',
+        dataType: 'json', // Expect JSON response
+        success: function(response) {
+            console.log('Update success:', response);
+            
+            if (response.status === 200) {
+                showAlert(response.message, 'success');
+                $('#editDriverModal').modal('hide');
+                
+                // Fix modal backdrop issue
+                setTimeout(function() {
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open').css('padding-right', '');
+                }, 100);
+                
+                // Update the table row instead of reloading
+                updateTableRow(driverId, response.driver);
+                
+            } else {
+                showAlert(response.message || 'Failed to update driver', 'danger');
+            }
+        },
+        error: function(xhr) {
+            console.error('Update error:', xhr);
+            
+            let message = 'Failed to update driver';
+            
+            if (xhr.responseJSON) {
+                if (xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                } else if (xhr.responseJSON.errors) {
+                    const errors = xhr.responseJSON.errors;
+                    message = Object.values(errors).flat().join('<br>');
                 }
-            });
-        });
+            }
+            
+            showAlert(message, 'danger');
+        },
+        complete: function() {
+            // Reset button state
+            $submitBtn.prop('disabled', false).html(originalBtnText);
+        }
+    });
+
+    return false; // Prevent any default form submission
+});
+
+// Function to update table row without page reload
+function updateTableRow(driverId, driver) {
+    const $row = $(`button[data-driver-id="${driverId}"]`).closest('tr');
+    
+    if ($row.length > 0) {
+        const statusBadge = driver.status === 'Active' ?
+            '<span class="badge rounded-pill text-bg-success">Active</span>' :
+            '<span class="badge rounded-pill text-bg-danger">Inactive</span>';
+        
+        // Update table cells (adjust column indices based on your table structure)
+        $row.find('td').eq(1).text(driver.name); // Name column
+        $row.find('td').eq(2).text(driver.license_number); // License column
+        $row.find('td').eq(3).text(driver.phone); // Phone column
+        $row.find('td').eq(4).html(statusBadge); // Status column
+        
+        // Add a brief highlight effect
+        $row.addClass('table-success');
+        setTimeout(function() {
+            $row.removeClass('table-success');
+        }, 2000);
+    }
+}
 
 
 
@@ -583,78 +681,205 @@
         });
 
 
-// Handle the actual delete when confirm button is clicked
-$(document).on('click', '#confirmDeleteBtn', function (e) {
-    e.preventDefault();
-    
-    const driverId = $('#deleteDriverId').val();
-    
-    if (!driverId || driverId.trim() === '') {
-        showAlert('Driver ID not found in modal!', 'danger');
-        return;
-    }
-    
-    const deleteUrl = "{{ url('driver/destroy') }}/" + driverId;
-    const $btn = $(this);
-    $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Deleting...');
-    
-    $.ajax({
-        url: deleteUrl,
-        method: 'POST',
-        data: {
-            _token: "{{ csrf_token() }}",
-            _method: 'DELETE'
-        },
-        success: function (response) {
-            console.log('Success response:', response);
-            
-            // Properly hide modal and remove backdrop
-            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
-            if (modal) {
-                modal.hide();
-            }
-            
-            // Alternative method - force remove backdrop
-            setTimeout(function() {
-                $('.modal-backdrop').remove();
-                $('body').removeClass('modal-open');
-                $('body').css('padding-right', '');
-            }, 100);
-            
-            showAlert(response.message || 'Driver deleted successfully', 'success');
-            
-            // Find and remove the deleted row from the table
-            $('button[data-driver-id="' + driverId + '"]').closest('tr').fadeOut(500, function() {
-                $(this).remove();
-                updateRowNumbers();
-            });
-        },
-        error: function (xhr) {
-            console.error('AJAX Error:', xhr);
-            let message = 'Failed to delete driver';
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                message = xhr.responseJSON.message;
-            }
-            showAlert(message, 'danger');
-            
-            // Also fix backdrop on error
-            setTimeout(function() {
-                $('.modal-backdrop').remove();
-                $('body').removeClass('modal-open');
-                $('body').css('padding-right', '');
-            }, 100);
-        },
-        complete: function() {
-            $btn.prop('disabled', false).html('<i class="bi bi-trash"></i> Delete Driver');
-        }
-    });
-});
+        // Handle the actual delete when confirm button is clicked
+        $(document).on('click', '#confirmDeleteBtn', function(e) {
+            e.preventDefault();
 
-// Optional: Function to update row numbers after deletion
-function updateRowNumbers() {
-    $('table tbody tr').each(function(index) {
-        $(this).find('td:first').text(index + 1);
-    });
-}
+            const driverId = $('#deleteDriverId').val();
+
+            if (!driverId || driverId.trim() === '') {
+                showAlert('Driver ID not found in modal!', 'danger');
+                return;
+            }
+
+            const deleteUrl = "{{ url('driver/destroy') }}/" + driverId;
+            const $btn = $(this);
+            $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Deleting...');
+
+            $.ajax({
+                url: deleteUrl,
+                method: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    _method: 'DELETE'
+                },
+                success: function(response) {
+                    console.log('Success response:', response);
+
+                    // Properly hide modal and remove backdrop
+                    const modal = bootstrap.Modal.getInstance(document.getElementById(
+                        'deleteConfirmModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+
+                    // Alternative method - force remove backdrop
+                    setTimeout(function() {
+                        $('.modal-backdrop').remove();
+                        $('body').removeClass('modal-open');
+                        $('body').css('padding-right', '');
+                    }, 100);
+
+                    showAlert(response.message || 'Driver deleted successfully', 'success');
+
+                    // Find and remove the deleted row from the table
+                    $('button[data-driver-id="' + driverId + '"]').closest('tr').fadeOut(500,
+                        function() {
+                            $(this).remove();
+                            updateRowNumbers();
+                        });
+                },
+                error: function(xhr) {
+                    console.error('AJAX Error:', xhr);
+                    let message = 'Failed to delete driver';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    }
+                    showAlert(message, 'danger');
+
+                    // Also fix backdrop on error
+                    setTimeout(function() {
+                        $('.modal-backdrop').remove();
+                        $('body').removeClass('modal-open');
+                        $('body').css('padding-right', '');
+                    }, 100);
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).html('<i class="bi bi-trash"></i> Delete Driver');
+                }
+            });
+        });
+
+        // Optional: Function to update row numbers after deletion
+        function updateRowNumbers() {
+            $('table tbody tr').each(function(index) {
+                $(this).find('td:first').text(index + 1);
+            });
+        }
+
+        // Handle view driver modal
+        $('#viewDriverModal').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const driverId = button.data('driver-id');
+
+            if (!driverId) {
+                showAlert('Driver ID not found!', 'danger');
+                return;
+            }
+
+            // Show loading state
+            $(this).find('.modal-body').html(`
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading driver details...</p>
+        </div>
+    `);
+
+            $.ajax({
+                url: "{{ url('driver/show') }}/" + driverId,
+                method: 'GET',
+                success: function(driver) {
+                    if (!driver || !driver.id) {
+                        showAlert('No driver data found!', 'danger');
+                        return;
+                    }
+
+                    // Format status badge
+                    let statusBadge = driver.status === 'Active' ?
+                        '<span class="badge rounded-pill text-bg-success">Active</span>' :
+                        '<span class="badge rounded-pill text-bg-danger">Inactive</span>';
+
+                    // Format joined date
+                    let joinedDate = driver.joined_date ?
+                        new Date(driver.joined_date).toLocaleDateString() : 'Not specified';
+
+                    // Update modal content
+                    const modalContent = `
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <h6 class="text-muted small">DRIVER ID</h6>
+                            <p class="mb-0 fw-medium">${driver.id}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted small">FULL NAME</h6>
+                            <p class="mb-0 fw-medium">${driver.name}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted small">LICENSE NUMBER</h6>
+                            <p class="mb-0">${driver.license_number}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted small">PHONE NUMBER</h6>
+                            <p class="mb-0">${driver.phone}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <h6 class="text-muted small">STATUS</h6>
+                            <p class="mb-0">${statusBadge}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted small">EMAIL ADDRESS</h6>
+                            <p class="mb-0">${driver.email || 'Not provided'}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted small">ADDRESS</h6>
+                            <p class="mb-0">${driver.address || 'Not provided'}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted small">JOINED DATE</h6>
+                            <p class="mb-0">${joinedDate}</p>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="bg-light rounded p-3">
+                            <h6 class="mb-3">Assigned Vehicles</h6>
+                            <p class="text-muted">No vehicles assigned yet.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+                    $('#viewDriverModal .modal-body').html(modalContent);
+
+                    // Set the driver ID on the edit button in the modal footer
+                    $('#viewDriverModal .btn-edit-driver').attr('data-driver-id', driver.id);
+
+                },
+                error: function(xhr) {
+                    console.error('View driver error:', xhr);
+                    $('#viewDriverModal .modal-body').html(`
+                <div class="text-center">
+                    <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3 text-danger">Error</h4>
+                    <p>Failed to load driver details.</p>
+                </div>
+            `);
+                }
+            });
+        });
+
+        // Handle edit button click from view modal
+        $(document).on('click', '#viewDriverModal .btn-edit-driver', function(e) {
+            const driverId = $(this).attr('data-driver-id');
+
+            // Close view modal
+            $('#viewDriverModal').modal('hide');
+
+            // Wait for view modal to close, then open edit modal
+            $('#viewDriverModal').on('hidden.bs.modal', function() {
+                // Trigger the edit modal with the driver ID
+                const editButton = $('<button>').attr('data-driver-id', driverId);
+                $('#editDriverModal').trigger('show.bs.modal', [{
+                    relatedTarget: editButton[0]
+                }]);
+
+                // Remove the event handler
+                $(this).off('hidden.bs.modal');
+            });
+        });
     </script>
 </x-app-layout>
