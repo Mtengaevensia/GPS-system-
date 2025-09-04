@@ -152,6 +152,12 @@
                             </a>
                         </li>
                         <li class="nav-item mb-2">
+                            <a href="{{ url('device/index') }}" class="nav-link px-3 py-2 rounded {{ request()->is('device/*') ? 'text-white bg-primary' : 'text-dark' }}">
+                                <i class="bi bi-person me-2"></i>
+                                {{ __('Devices') }}
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
                             <a href="{{ url('trips/index') }}" class="nav-link px-3 py-2 rounded {{ request()->is('trips/*') ? 'text-white bg-primary' : 'text-dark' }}">
                                 <i class="bi bi-map me-2"></i>
                                 {{ __('Trips') }}

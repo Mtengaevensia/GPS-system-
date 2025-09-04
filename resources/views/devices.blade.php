@@ -1,36 +1,35 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Drivers') }}
+            {{ __('Devices') }}
         </h2>
     </x-slot>
-
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Page Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h1 class="h3 mb-0">Drivers</h1>
-                    <p class="text-muted">Manage and monitor all drivers in the system.</p>
+                    <h1 class="h3 mb-0">Devices</h1>
+                    <p class="text-muted">Manage and monitor all devices in the system.</p>
                 </div>
                 <button type="button" class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal"
-                    data-bs-target="#addDriverModal">
-                    <i class="bi bi-plus-lg me-2"></i> Add Driver
+                    data-bs-target="#addDeviceModal">
+                    <i class="bi bi-plus-lg me-2"></i> Add Device
                 </button>
             </div>
 
               <!-- Filters and Search -->
             <div class="card border-0 shadow mb-4">
                 <div class="card-body p-4">
-                    <form action="{{ url('driver/index') }}" method="GET">
+                    <form action="{{ url('device/index') }}" method="GET">
                         <div class="row g-3">
                             <div class="col-12 col-md-3">
                                 <label for="statusFilter" class="form-label small text-muted">Status</label>
                                 <select class="form-select" id="statusFilter" name="status">
                                     <option value="">All Statuses</option>
-                                    <option value="Active" {{ request('status') == 'Active' ? 'selected' : '' }}>Active</option>
-                                    <option value="Inactive" {{ request('status') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                                 </select>
                             </div>
                             <div class="col-12 col-md-7">
@@ -53,7 +52,7 @@
                         @if(request()->hasAny(['status', 'search']))
                             <div class="row mt-3">
                                 <div class="col-12">
-                                    <a href="{{ url('driver/index') }}" class="btn btn-outline-secondary btn-sm">
+                                    <a href="{{ url('device/index') }}" class="btn btn-outline-secondary btn-sm">
                                         <i class="bi bi-x-circle me-1"></i> Clear Filters
                                     </a>
                                 </div>
@@ -67,7 +66,7 @@
             @if(request()->hasAny(['status', 'search']))
                 <div class="alert alert-info mb-4">
                     <i class="bi bi-info-circle me-2"></i>
-                    Showing {{ $drivers->count() }} of {{ $drivers->total() }} results
+                    Showing {{ $devices->count() }} of {{ $devices->total() }} results
                     @if(request('status'))
                         for status: <strong>{{ request('status') }}</strong>
                     @endif
@@ -77,7 +76,7 @@
                 </div>
             @endif
 
-            <!-- Drivers Table -->
+            <!-- Devices Table -->
             <div class="card border-0 shadow">
                 <div class="card-body p-0">
                     <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
@@ -86,41 +85,39 @@
                                 <tr>
                                     <th scope="col" class="ps-4">#</th>
                                     <th scope="col">Name</th>
-                                    <th scope="col">License Number</th>
-                                    <th scope="col">Phone</th>
+                                    <th scope="col">Imei</th>
                                     <th scope="col">Status</th>
                                     <th scope="col" class="text-end pe-4">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($drivers as $driver)
+                                @forelse ($devices as $device)
                                     <tr>
                                         <td class="ps-4">{{ $loop->iteration }}</td>
-                                        <td class="fw-medium">{{ $driver->name }}</td>
-                                        <td>{{ $driver->license_number }}</td>
-                                        <td>{{ $driver->phone }}</td>
+                                        <td class="fw-medium">{{ $device->name }}</td>
+                                        <td>{{ $device->imei }}</td>
                                         <td>
-                                            @if ($driver->status == 'Active')
+                                            @if ($device->status == 'active')
                                                 <span class="badge rounded-pill text-bg-success">Active</span>
                                             @else
                                                 <span class="badge rounded-pill text-bg-danger">Inactive</span>
                                             @endif
                                         </td>
                                         <td class="text-end pe-4">
-                                            <button type="button" class="btn btn-sm btn-info me-1 btn-view-driver"
-                                                data-bs-target="#viewDriverModal" data-bs-toggle="modal"
-                                                data-driver-id="{{ $driver->id }}">
+                                            <button type="button" class="btn btn-sm btn-info me-1 btn-view-device"
+                                                data-bs-target="#viewDeviceModal" data-bs-toggle="modal"
+                                                data-device-id="{{ $device->id }}">
                                                 <i class="bi bi-eye"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-warning me-1 btn-edit-driver"
-                                                data-bs-target="#editDriverModal" data-bs-toggle="modal"
-                                                data-driver-id="{{ $driver->id }}">
+                                            <button type="button" class="btn btn-sm btn-warning me-1 btn-edit-device"
+                                                data-bs-target="#editDeviceModal" data-bs-toggle="modal"
+                                                data-device-id="{{ $device->id }}">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-danger btn-delete-driver"
+                                            <button type="button" class="btn btn-sm btn-danger btn-delete-device"
                                                 data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
-                                                data-driver-id="{{ $driver->id }}"
-                                                data-driver-name="{{ $driver->name }}">
+                                                data-device-id="{{ $device->id }}"
+                                                data-device-name="{{ $device->name }}">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </td>
@@ -128,7 +125,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="6" class="text-center text-muted py-4">
-                                            No drivers found.
+                                            No devices found.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -139,119 +136,86 @@
                 </div>
 
                 <div class="d-flex justify-content-center mt-3 mb-4">
-                    {!! $drivers->withQueryString()->links('pagination::bootstrap-5') !!}
+                    {!! $devices->withQueryString()->links('pagination::bootstrap-5') !!}
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Add Driver Modal -->
-    <div class="modal fade" id="addDriverModal" tabindex="-1" aria-labelledby="addDriverModalLabel" aria-hidden="true">
+<!-- Add Device Modal -->
+    <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addDriverModalLabel">Add New Driver</h5>
+                    <h5 class="modal-title" id="addDeviceModalLabel">Add New Device</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="addDriverForm">
+                <form id="addDeviceForm">
                     <div class="modal-body">
                         @csrf
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label for="fullName" class="form-label">Full Name</label>
-                                <input type="text" class="form-control" id="fullName" name="name" required>
+                                <label for="deviceName" class="form-label">Device Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
                             </div>
                             <div class="col-md-6">
-                                <label for="licenseNumber" class="form-label">License Number</label>
-                                <input type="text" class="form-control" id="licenseNumber" name="license_number"
+                                <label for="imei" class="form-label">Device IMEI</label>
+                                <input type="text" class="form-control" id="imei" name="imei"
                                     required>
                             </div>
                             <div class="col-md-6">
-                                <label for="phoneNumber" class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" id="phoneNumber" name="phone" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="emailAddress" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="emailAddress" name="email">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="driverStatus" class="form-label">Status</label>
-                                <select class="form-select" id="driverStatus" name="status" required>
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
+                                <label for="deviceStatus" class="form-label">Status</label>
+                                <select class="form-select" id="deviceStatus" name="status" required>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
                                 </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="joinedDate" class="form-label">Joined Date</label>
-                                <input type="date" class="form-control" id="joinedDate" name="joined_date">
-                            </div>
-                            <div class="col-12">
-                                <label for="address" class="form-label">Address</label>
-                                <textarea class="form-control" id="address" name="address" rows="2"></textarea>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary" id="saveNewDriver">Save Driver</button>
+                        <button type="submit" class="btn btn-primary" id="saveNewDevice">Save Device</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Edit Driver Modal -->
-    <div class="modal fade" id="editDriverModal" tabindex="-1" aria-labelledby="editDriverModalLabel"
+    <!-- Edit Device Modal -->
+    <div class="modal fade" id="editDeviceModal" tabindex="-1" aria-labelledby="editDeviceModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editDriverModalLabel">Edit Driver</h5>
+                    <h5 class="modal-title" id="editDeviceModalLabel">Edit Device</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editDriverForm">
+                    <form id="editDeviceForm">
                         @csrf
                         @method('PUT')
-                        <input type="hidden" name="id" id="editDriverId">
+                        <input type="hidden" name="id" id="editDeviceId">
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label">Full Name</label>
+                                <label class="form-label">Device Name</label>
                                 <input type="text" class="form-control" name="name" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">License Number</label>
-                                <input type="text" class="form-control" name="license_number" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" name="phone" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Email Address</label>
-                                <input type="email" class="form-control" name="email">
+                                <label class="form-label">Device IMEI</label>
+                                <input type="text" class="form-control" name="imei" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Status</label>
                                 <select class="form-select" name="status" required>
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Joined Date</label>
-                                <input type="date" class="form-control" name="joined_date">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Address</label>
-                                <textarea class="form-control" name="address" rows="2"></textarea>
-                            </div>
                         </div>
-
                         <div class="modal-footer mt-3">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button class="btn btn-sm btn-primary btn-edit-driver">
+                            <button class="btn btn-sm btn-primary btn-edit-device">
                                 Save Changes
                             </button>
 
@@ -262,61 +226,41 @@
         </div>
     </div>
 
-
-
-
-    <!-- View Driver Modal -->
-    <div class="modal fade" id="viewDriverModal" tabindex="-1" aria-labelledby="viewDriverModalLabel"
+    <!-- View Device Modal -->
+    <div class="modal fade" id="viewDeviceModal" tabindex="-1" aria-labelledby="viewDeviceModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="viewDriverModalLabel">Driver Details</h5>
+                    <h5 class="modal-title" id="viewDeviceModalLabel">Device Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row g-4">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <h6 class="text-muted small">DRIVER ID</h6>
-                                <p class="mb-0 fw-medium" id="viewDriverId"></p>
+                                <h6 class="text-muted small">DEVICE ID</h6>
+                                <p class="mb-0 fw-medium" id="viewDeviceId"></p>
                             </div>
                             <div class="mb-3">
-                                <h6 class="text-muted small">FULL NAME</h6>
+                                <h6 class="text-muted small">DEVICE NAME</h6>
                                 <p class="mb-0 fw-medium" id="viewFullName"></p>
                             </div>
                             <div class="mb-3">
-                                <h6 class="text-muted small">LICENSE NUMBER</h6>
+                                <h6 class="text-muted small">DEVICE IMEI</h6>
                                 <p class="mb-0" id="viewLicenseNumber"></p>
                             </div>
-                            <div class="mb-3">
-                                <h6 class="text-muted small">PHONE NUMBER</h6>
-                                <p class="mb-0" id="viewPhoneNumber"></p>
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <h6 class="text-muted small">STATUS</h6>
                                 <p class="mb-0" id="viewStatusContainer"></p>
-                            </div>
-                            <div class="mb-3">
-                                <h6 class="text-muted small">EMAIL ADDRESS</h6>
-                                <p class="mb-0" id="viewEmailAddress"></p>
-                            </div>
-                            <div class="mb-3">
-                                <h6 class="text-muted small">ADDRESS</h6>
-                                <p class="mb-0" id="viewAddress"></p>
-                            </div>
-                            <div class="mb-3">
-                                <h6 class="text-muted small">JOINED DATE</h6>
-                                <p class="mb-0" id="viewJoinedDate"></p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button class="btn btn-sm btn-primary btn-edit-driver">
+                    <button class="btn btn-sm btn-primary btn-edit-device">
                         Edit
                     </button>
                 </div>
@@ -324,7 +268,6 @@
         </div>
     </div>
     </div>
-
 
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
@@ -335,21 +278,20 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Are you sure you want to delete driver?</p>
+                    <p>Are you sure you want to delete device?</p>
                     <p class="text-danger mb-0">This action cannot be undone.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <!-- Add this hidden input -->
-                    <input type="hidden" id="deleteDriverId" value="">
+                    <input type="hidden" id="deleteDeviceId" value="">
                     <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
-                        <i class="bi bi-trash"></i> Delete Driver
+                        <i class="bi bi-trash"></i> Delete Device
                     </button>
                 </div>
             </div>
         </div>
     </div>
-
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -357,7 +299,7 @@
     <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
 
     <script>
-        // Function to show dynamic alerts like your session() alerts
+              // Function to show dynamic alerts like your session() alerts
         function showAlert(message, type = 'success') {
             const alertId = 'alert-' + Date.now();
             const bgClass = type === 'success' ? 'bg-success' : 'bg-danger';
@@ -418,12 +360,12 @@
         }
 
         // AJAX form submission
-        // AJAX form submission for adding driver
-        $(document).on('submit', '#addDriverForm', function(e) {
+        // AJAX form submission for adding device
+        $(document).on('submit', '#addDeviceForm', function(e) {
             e.preventDefault();
 
             let formData = new FormData(this);
-            const $submitBtn = $('#saveNewDriver');
+            const $submitBtn = $('#saveNewDevice');
 
             // Show loading state
             $submitBtn.prop('disabled', true).html(
@@ -431,14 +373,14 @@
 
             $.ajax({
                 type: "POST",
-                url: "{{ url('driver/store') }}",
+                url: "{{ url('device/store') }}",
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function(response) {
                     if (response.status === 200) {
-                        $('#addDriverModal').modal('hide');
-                        $('#addDriverForm')[0].reset();
+                        $('#addDeviceModal').modal('hide');
+                        $('#addDeviceForm')[0].reset();
 
                         // Fix modal backdrop
                         $('.modal-backdrop').fadeOut(300, function() {
@@ -448,33 +390,32 @@
 
                         showAlert(response.message, 'success');
 
-                        // Append new driver to table with proper data attributes
-                        let driver = response.driver;
-                        let statusBadge = driver.status === 'Active' ?
+                        // Append new device to table with proper data attributes
+                        let device = response.device;
+                        let statusBadge = device.status === 'active' ?
                             '<span class="badge rounded-pill text-bg-success">Active</span>' :
                             '<span class="badge rounded-pill text-bg-danger">Inactive</span>';
 
                         let newRow = `
                     <tr>
                         <td class="ps-4">${$('#myTable tbody tr').length + 1}</td>
-                        <td>${driver.name}</td>
-                        <td>${driver.license_number}</td>
-                        <td>${driver.phone}</td>
+                        <td>${device.name}</td>
+                        <td>${device.imei}</td>
                         <td>${statusBadge}</td>
                         <td class="text-end pe-4">
-                            <button type="button" class="btn btn-sm btn-info me-1 btn-view-driver"
-                                    data-bs-target="#viewDriverModal" data-bs-toggle="modal"
-                                    data-driver-id="${driver.id}">
+                            <button type="button" class="btn btn-sm btn-info me-1 btn-view-device"
+                                    data-bs-target="#viewDeviceModal" data-bs-toggle="modal"
+                                    data-device-id="${device.id}">
                                 <i class="bi bi-eye"></i>
                             </button>
-                            <button type="button" class="btn btn-sm btn-warning me-1 btn-edit-driver"
-                                    data-bs-target="#editDriverModal" data-bs-toggle="modal"
-                                    data-driver-id="${driver.id}">
+                            <button type="button" class="btn btn-sm btn-warning me-1 btn-edit-device"
+                                    data-bs-target="#editDeviceModal" data-bs-toggle="modal"
+                                    data-device-id="${device.id}">
                                 <i class="bi bi-pencil"></i>
                             </button>
-                            <button type="button" class="btn btn-sm btn-danger btn-delete-driver" 
+                            <button type="button" class="btn btn-sm btn-danger btn-delete-device" 
                                     data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
-                                    data-driver-id="${driver.id}">
+                                    data-device-id="${device.id}">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -486,11 +427,11 @@
                         $('#myTable').parent().scrollTop($('#myTable').parent()[0].scrollHeight);
 
                     } else {
-                        showAlert(response.message || 'Failed to create driver', 'danger');
+                        showAlert(response.message || 'Failed to create device', 'danger');
                     }
                 },
                 error: function(xhr) {
-                    console.error('Add driver error:', xhr);
+                    console.error('Add device error:', xhr);
                     let message = 'An unexpected error occurred';
 
                     if (xhr.responseJSON?.errors) {
@@ -504,7 +445,7 @@
                 },
                 complete: function() {
                     // Reset button state
-                    $submitBtn.prop('disabled', false).html('Save Driver');
+                    $submitBtn.prop('disabled', false).html('Save Device');
                 }
             });
         });
@@ -515,61 +456,58 @@
             });
         }
 
-
-
         // OPEN EDIT MODAL AND LOAD DRIVER DATA
         // Handle click on Edit button
-        $(document).on('click', '.btn-edit-driver', function() {
-            const driverId = $(this).data('driver-id'); // Fetch ID from the button
+        $(document).on('click', '.btn-edit-device', function() {
+            const deviceId = $(this).data('device-id'); // Fetch ID from the button
 
-            if (!driverId) {
-                showAlert('Driver ID not found!', 'danger');
+            if (!deviceId) {
+                showAlert('Device ID not found!', 'danger');
                 return;
             }
 
             $.ajax({
-                url: "{{ url('driver/show') }}/" + driverId,
+                url: "{{ url('device/show') }}/" + deviceId,
                 method: 'GET',
-                success: function(driver) {
+                success: function(device) {
 
-                    if (!driver || !driver.id) {
-                        showAlert('No driver data found!', 'danger');
+                    if (!device || !device.id) {
+                        showAlert('No device data found!', 'danger');
                         return;
                     }
 
                     // Set hidden ID input
-                    $('#editDriverId').val(driver.id);
+                    $('#editDeviceId').val(device.id);
 
                     // Fill all matching fields dynamically
-                    $('#editDriverForm').find('input, select, textarea').each(function() {
+                    $('#editDeviceForm').find('input, select, textarea').each(function() {
                         const fieldName = $(this).attr('name');
-                        if (driver[fieldName] !== undefined) {
-                            $(this).val(driver[fieldName]);
+                        if (device[fieldName] !== undefined) {
+                            $(this).val(device[fieldName]);
                         }
                     });
 
                     // Show modal
-                    $('#editDriverModal').modal('show');
+                    $('#editDeviceModal').modal('show');
                 },
                 error: function(xhr) {
-                    showAlert('Failed to load driver data.', 'danger');
+                    showAlert('Failed to load device data.', 'danger');
                     console.error('Error response:', xhr.responseText);
                 }
             });
         });
 
-
         // SUBMIT EDIT FORM
-        $(document).on('submit', '#editDriverForm', function(e) {
+        $(document).on('submit', '#editDeviceForm', function(e) {
             e.preventDefault();
             e.stopPropagation(); // Prevent event bubbling
 
             console.log('Edit form submitted via AJAX');
 
-            const driverId = $('#editDriverId').val();
+            const deviceId = $('#editDeviceId').val();
 
-            if (!driverId) {
-                showAlert('Driver ID not found!', 'danger');
+            if (!deviceId) {
+                showAlert('Device ID not found!', 'danger');
                 return false;
             }
 
@@ -582,7 +520,7 @@
                 '<span class="spinner-border spinner-border-sm"></span> Updating...');
 
             $.ajax({
-                url: "{{ url('driver/update') }}/" + driverId,
+                url: "{{ url('device/update') }}/" + deviceId,
                 method: 'POST',
                 data: formData + '&_method=PUT&_token={{ csrf_token() }}',
                 dataType: 'json', // Expect JSON response
@@ -591,7 +529,7 @@
 
                     if (response.status === 200) {
                         showAlert(response.message, 'success');
-                        $('#editDriverModal').modal('hide');
+                        $('#editDeviceModal').modal('hide');
 
                         // Fix modal backdrop issue
                         setTimeout(function() {
@@ -600,16 +538,16 @@
                         }, 100);
 
                         // Update the table row instead of reloading
-                        updateTableRow(driverId, response.driver);
+                        updateTableRow(deviceId, response.device);
 
                     } else {
-                        showAlert(response.message || 'Failed to update driver', 'danger');
+                        showAlert(response.message || 'Failed to update device', 'danger');
                     }
                 },
                 error: function(xhr) {
                     console.error('Update error:', xhr);
 
-                    let message = 'Failed to update driver';
+                    let message = 'Failed to update device';
 
                     if (xhr.responseJSON) {
                         if (xhr.responseJSON.message) {
@@ -632,19 +570,17 @@
         });
 
         // Function to update table row without page reload
-        function updateTableRow(driverId, driver) {
-            const $row = $(`button[data-driver-id="${driverId}"]`).closest('tr');
+        function updateTableRow(deviceId, device) {
+            const $row = $(`button[data-device-id="${deviceId}"]`).closest('tr');
 
             if ($row.length > 0) {
-                const statusBadge = driver.status === 'active' ?
+                const statusBadge = device.status === 'active' ?
                     '<span class="badge rounded-pill text-bg-success">Active</span>' :
                     '<span class="badge rounded-pill text-bg-danger">Inactive</span>';
 
                 // Update table cells (adjust column indices based on your table structure)
-                $row.find('td').eq(1).text(driver.name); // Name column
-                $row.find('td').eq(2).text(driver.license_number); // License column
-                $row.find('td').eq(3).text(driver.phone); // Phone column
-                $row.find('td').eq(4).html(statusBadge); // Status column
+                $row.find('td').eq(1).text(device.name); // Name column
+                $row.find('td').eq(2).text(device.imei); 
 
                 // Add a brief highlight effect
                 $row.addClass('table-success');
@@ -654,36 +590,33 @@
             }
         }
 
-
-
         // Handle delete button click in table (opens modal)
-        $(document).on('click', '.btn-delete-driver', function(e) {
+        $(document).on('click', '.btn-delete-device', function(e) {
             e.preventDefault();
 
-            const driverId = $(this).data('driver-id');
-            const driverName = $(this).data('driver-name'); // Adjust based on your table
+            const deviceId = $(this).data('device-id');
+            const deviceName = $(this).data('device-name'); // Adjust based on your table
 
-            // Set the driver info in modal
-            $('#deleteDriverId').val(driverId);
-            $('#deleteDriverName').text(driverName);
+            // Set the device info in modal
+            $('#deleteDeviceId').val(deviceId);
+            $('#deleteDeviceName').text(deviceName);
 
             // Show modal
             $('#deleteConfirmModal').modal('show');
         });
 
-
         // Handle the actual delete when confirm button is clicked
         $(document).on('click', '#confirmDeleteBtn', function(e) {
             e.preventDefault();
 
-            const driverId = $('#deleteDriverId').val();
+            const deviceId = $('#deleteDeviceId').val();
 
-            if (!driverId || driverId.trim() === '') {
-                showAlert('Driver ID not found in modal!', 'danger');
+            if (!deviceId || deviceId.trim() === '') {
+                showAlert('Device ID not found in modal!', 'danger');
                 return;
             }
 
-            const deleteUrl = "{{ url('driver/destroy') }}/" + driverId;
+            const deleteUrl = "{{ url('device/destroy') }}/" + deviceId;
             const $btn = $(this);
             $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Deleting...');
 
@@ -711,10 +644,10 @@
                         $('body').css('padding-right', '');
                     }, 100);
 
-                    showAlert(response.message || 'Driver deleted successfully', 'success');
+                    showAlert(response.message || 'Device deleted successfully', 'success');
 
                     // Find and remove the deleted row from the table
-                    $('button[data-driver-id="' + driverId + '"]').closest('tr').fadeOut(500,
+                    $('button[data-device-id="' + deviceId + '"]').closest('tr').fadeOut(500,
                         function() {
                             $(this).remove();
                             updateRowNumbers();
@@ -722,7 +655,7 @@
                 },
                 error: function(xhr) {
                     console.error('AJAX Error:', xhr);
-                    let message = 'Failed to delete driver';
+                    let message = 'Failed to delete device';
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         message = xhr.responseJSON.message;
                     }
@@ -736,7 +669,7 @@
                     }, 100);
                 },
                 complete: function() {
-                    $btn.prop('disabled', false).html('<i class="bi bi-trash"></i> Delete Driver');
+                    $btn.prop('disabled', false).html('<i class="bi bi-trash"></i> Delete Device');
                 }
             });
         });
@@ -748,13 +681,13 @@
             });
         }
 
-        // Handle view driver modal
-        $('#viewDriverModal').on('show.bs.modal', function(event) {
+            // Handle view device modal
+        $('#viewDeviceModal').on('show.bs.modal', function(event) {
             const button = $(event.relatedTarget);
-            const driverId = button.data('driver-id');
+            const deviceId = button.data('device-id');
 
-            if (!driverId) {
-                showAlert('Driver ID not found!', 'danger');
+            if (!deviceId) {
+                showAlert('Device ID not found!', 'danger');
                 return;
             }
 
@@ -764,89 +697,61 @@
             <div class="spinner-border" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <p class="mt-2">Loading driver details...</p>
+            <p class="mt-2">Loading device details...</p>
         </div>
     `);
 
-            $.ajax({
-                url: "{{ url('driver/show') }}/" + driverId,
+     $.ajax({
+                url: "{{ url('device/show') }}/" + deviceId,
                 method: 'GET',
-                success: function(driver) {
-                    if (!driver || !driver.id) {
-                        showAlert('No driver data found!', 'danger');
+                success: function(device) {
+                    if (!device || !device.id) {
+                        showAlert('No device data found!', 'danger');
                         return;
                     }
 
                     // Format status badge
-                    let statusBadge = driver.status === 'Active' ?
+                    let statusBadge = device.status === 'active' ?
                         '<span class="badge rounded-pill text-bg-success">Active</span>' :
                         '<span class="badge rounded-pill text-bg-danger">Inactive</span>';
 
                     // Format joined date
-                    let joinedDate = driver.joined_date ?
-                        new Date(driver.joined_date).toLocaleDateString() : 'Not specified';
+                    let joinedDate = device.joined_date ?
+                        new Date(device.joined_date).toLocaleDateString() : 'Not specified';
 
                     // Update modal content
                     const modalContent = `
                 <div class="row g-4">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <h6 class="text-muted small">DRIVER ID</h6>
-                            <p class="mb-0 fw-medium">${driver.id}</p>
+                            <h6 class="text-muted small">DEVICE NAME</h6>
+                            <p class="mb-0 fw-medium">${device.name}</p>
                         </div>
                         <div class="mb-3">
-                            <h6 class="text-muted small">FULL NAME</h6>
-                            <p class="mb-0 fw-medium">${driver.name}</p>
+                            <h6 class="text-muted small">DEVICE IMEI</h6>
+                            <p class="mb-0 fw-medium">${device.imei}</p>
                         </div>
-                        <div class="mb-3">
-                            <h6 class="text-muted small">LICENSE NUMBER</h6>
-                            <p class="mb-0">${driver.license_number}</p>
-                        </div>
-                        <div class="mb-3">
-                            <h6 class="text-muted small">PHONE NUMBER</h6>
-                            <p class="mb-0">${driver.phone}</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
                         <div class="mb-3">
                             <h6 class="text-muted small">STATUS</h6>
                             <p class="mb-0">${statusBadge}</p>
-                        </div>
-                        <div class="mb-3">
-                            <h6 class="text-muted small">EMAIL ADDRESS</h6>
-                            <p class="mb-0">${driver.email || 'Not provided'}</p>
-                        </div>
-                        <div class="mb-3">
-                            <h6 class="text-muted small">ADDRESS</h6>
-                            <p class="mb-0">${driver.address || 'Not provided'}</p>
-                        </div>
-                        <div class="mb-3">
-                            <h6 class="text-muted small">JOINED DATE</h6>
-                            <p class="mb-0">${joinedDate}</p>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="bg-light rounded p-3">
-                            <h6 class="mb-3">Assigned Vehicles</h6>
-                            <p class="text-muted">No vehicles assigned yet.</p>
                         </div>
                     </div>
                 </div>
             `;
 
-                    $('#viewDriverModal .modal-body').html(modalContent);
+             $('#viewDeviceModal .modal-body').html(modalContent);
 
-                    // Set the driver ID on the edit button in the modal footer
-                    $('#viewDriverModal .btn-edit-driver').attr('data-driver-id', driver.id);
-
+                    // Set the device ID on the edit button in the modal footer
+                    $('#viewDeviceModal .btn-edit-device').attr('data-device-id', device.id);
                 },
-                error: function(xhr) {
-                    console.error('View driver error:', xhr);
-                    $('#viewDriverModal .modal-body').html(`
+
+                   error: function(xhr) {
+                    console.error('View device error:', xhr);
+                    $('#viewDeviceModal .modal-body').html(`
                 <div class="text-center">
                     <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
                     <h4 class="mt-3 text-danger">Error</h4>
-                    <p>Failed to load driver details.</p>
+                    <p>Failed to load device details.</p>
                 </div>
             `);
                 }
@@ -854,17 +759,17 @@
         });
 
         // Handle edit button click from view modal
-        $(document).on('click', '#viewDriverModal .btn-edit-driver', function(e) {
-            const driverId = $(this).attr('data-driver-id');
+        $(document).on('click', '#viewDeviceModal .btn-edit-device', function(e) {
+            const deviceId = $(this).attr('data-device-id');
 
             // Close view modal
-            $('#viewDriverModal').modal('hide');
+            $('#viewDeviceModal').modal('hide');
 
             // Wait for view modal to close, then open edit modal
-            $('#viewDriverModal').on('hidden.bs.modal', function() {
-                // Trigger the edit modal with the driver ID
-                const editButton = $('<button>').attr('data-driver-id', driverId);
-                $('#editDriverModal').trigger('show.bs.modal', [{
+            $('#viewDeviceModal').on('hidden.bs.modal', function() {
+                // Trigger the edit modal with the device ID
+                const editButton = $('<button>').attr('data-device-id', deviceId);
+                $('#editDeviceModal').trigger('show.bs.modal', [{
                     relatedTarget: editButton[0]
                 }]);
 
@@ -873,4 +778,6 @@
             });
         });
     </script>
-</x-app-layout>
+
+
+    </x-app-layout>

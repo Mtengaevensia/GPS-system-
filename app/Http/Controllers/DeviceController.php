@@ -3,18 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\View\View;
-use App\Models\Driver;
+use App\Models\Device;
 
-class DriverController extends Controller
+
+class DeviceController extends Controller
 {
-    /**
-     * Display a listing of the drivers.
-     */
-    public function index()
+    //
+     public function index()
     {
         $request = request();
-        $query = Driver::query();
+        $query = Device::query();
 
         // Filter by status
         if ($request->filled('status')) {
@@ -33,71 +31,62 @@ class DriverController extends Controller
         }
 
         // Paginate results with query string preservation
-        $drivers = $query->paginate(5)->withQueryString();
+        $devices = $query->paginate(5)->withQueryString();
 
-        return view('drivers', compact('drivers'));
+        return view('devices', compact('devices'));
     }
-    /**
-     * Show the form for creating a new driver.
-     */
-    public function create() {}
 
-    /**
-     * Store a newly created driver in storage.
-     */
-    public function store(Request $request)
+      public function create() {}
+
+      public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'license_number' => 'required|string|max:50|unique:drivers,license_number',
-            'phone' => 'required|string|max:20',
-            'status' => 'required|in:Active,Inactive',
-            'email' => 'nullable|email|unique:drivers,email',
-            'joined_date' => 'nullable|date',
-            'address' => 'nullable|string|max:255',
+            'imei' => 'required|string|max:50|unique:devices,imei',
+            'status' => 'required|in:active,inactive',
         ]);
 
         try {
-            $driver = Driver::create($validated);
+            $device = Device::create($validated);
 
             if (request()->ajax()) {
                 return response()->json([
                     'status' => 200,
-                    'message' => 'Driver created successfully',
-                    'driver' => $driver
+                    'message' => 'Device created successfully',
+                    'device' => $device
                 ]);
             }
 
-            return redirect()->back()->with('success', 'Driver created successfully');
+            return redirect()->back()->with('success', 'Device created successfully');
         } catch (\Exception $e) {
             if (request()->ajax()) {
                 return response()->json([
                     'status' => 500,
-                    'message' => 'Failed to create driver: ' . $e->getMessage()
+                    'message' => 'Failed to create device: ' . $e->getMessage()
                 ], 500);
             }
 
-            return redirect()->back()->with('error', 'Failed to create driver');
+            return redirect()->back()->with('error', 'Failed to create device');
         }
     }
 
-    public function show()
+      public function show()
     {
         // Get the ID from the URL segments
         $segments = request()->segments();
         $id = end($segments); // Gets the last segment
 
 
-        $driver = Driver::find($id);
+        $device = Device::find($id);
 
-        if (!$driver) {
-            return response()->json(['error' => 'Driver not found'], 404);
+        if (!$device) {
+            return response()->json(['error' => 'Device not found'], 404);
         }
 
-        return response()->json($driver);
+        return response()->json($device);
     }
 
-    public function update($id = null)
+     public function update($id = null)
     {
         // Handle dynamic routing parameter extraction
         if (is_array($id)) {
@@ -109,47 +98,39 @@ class DriverController extends Controller
             $id = end($segments);
         }
 
-        // Find the driver
-        $driver = Driver::find($id);
+        // Find the device
+        $device = Device::find($id);
 
-        if (!$driver) {
+        if (!$device) {
             return response()->json([
                 'status' => 404,
-                'message' => 'Driver not found'
+                'message' => 'Device not found'
             ], 404);
         }
 
         // Validate the request
         $validated = request()->validate([
             'name' => 'required|string|max:255',
-            'license_number' => 'required|string|max:50',
-            'phone' => 'required|string|max:20',
-            'status' => 'required|in:Active,Inactive',
-            'email' => 'nullable|email',
-            'joined_date' => 'nullable|date',
-            'address' => 'nullable|string|max:255',
+            'imei' => 'required|string|max:50|unique:devices,imei',
+            'status' => 'required|in:active,inactive',
         ]);
 
         try {
-            $driver->update($validated);
+            $device->update($validated);
 
             return response()->json([
                 'status' => 200,
-                'message' => 'Driver updated successfully',
-                'driver' => $driver->fresh() // Get updated data
+                'message' => 'Device updated successfully',
+                'device' => $device->fresh() // Get updated data
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 500,
-                'message' => 'Failed to update driver: ' . $e->getMessage()
+                'message' => 'Failed to update device: ' . $e->getMessage()
             ], 500);
         }
     }
 
-
-    /**
-     * Remove the specified driver from storage.
-     */
     public function destroy($id = null)
     {
         // Handle dynamic routing parameter extraction
@@ -166,41 +147,41 @@ class DriverController extends Controller
             if (request()->ajax()) {
                 return response()->json([
                     'status' => 400,
-                    'message' => 'Driver ID is required'
+                    'message' => 'Device ID is required'
                 ], 400);
             }
-            return redirect()->back()->with('error', 'Driver ID is required');
+            return redirect()->back()->with('error', 'Device ID is required');
         }
 
         try {
-            $driver = Driver::findOrFail($id);
-            $driver->delete();
+            $device = Device::findOrFail($id);
+            $device->delete();
 
             // Check if it's an AJAX request
             if (request()->ajax()) {
                 return response()->json([
                     'status' => 200,
-                    'message' => 'Driver deleted successfully'
+                    'message' => 'Device deleted successfully'
                 ]);
             }
 
-            return redirect()->back()->with('success', 'Driver deleted successfully');
+            return redirect()->back()->with('success', 'Device deleted successfully');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             if (request()->ajax()) {
                 return response()->json([
                     'status' => 404,
-                    'message' => 'Driver not found'
+                    'message' => 'Device not found'
                 ], 404);
             }
-            return redirect()->back()->with('error', 'Driver not found');
+            return redirect()->back()->with('error', 'Device not found');
         } catch (\Exception $e) {
             if (request()->ajax()) {
                 return response()->json([
                     'status' => 500,
-                    'message' => 'Failed to delete driver: ' . $e->getMessage()
+                    'message' => 'Failed to delete device: ' . $e->getMessage()
                 ], 500);
             }
-            return redirect()->back()->with('error', 'Failed to delete driver');
+            return redirect()->back()->with('error', 'Failed to delete device');
         }
     }
 }

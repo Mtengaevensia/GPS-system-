@@ -4,117 +4,152 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Models\Vehicle;
 
 class VehicleController extends Controller
 {
     /**
      * Display a listing of the vehicles.
      */
-    public function index(): View
+    public function index()
     {
-        // In a real application, you would fetch vehicles from the database
-        // For now, we'll use static sample data
-        $vehicles = [
-            [
-                'id' => 1,
-                'plate_number' => 'KBZ 123A',
-                'type' => 'Truck',
-                'driver' => 'John Doe',
-                'status' => 'Active',
-                'location' => 'Nairobi CBD, Moi Avenue'
-            ],
-            [
-                'id' => 2,
-                'plate_number' => 'KCY 456B',
-                'type' => 'Van',
-                'driver' => 'Jane Smith',
-                'status' => 'Offline',
-                'location' => 'Westlands, Waiyaki Way'
-            ],
-            [
-                'id' => 3,
-                'plate_number' => 'KDG 789C',
-                'type' => 'Car',
-                'driver' => 'Robert Johnson',
-                'status' => 'Maintenance',
-                'location' => 'Karen, Ngong Road'
-            ],
-            [
-                'id' => 4,
-                'plate_number' => 'KBN 321D',
-                'type' => 'Truck',
-                'driver' => 'Michael Brown',
-                'status' => 'Active',
-                'location' => 'Mombasa Road, Syokimau'
-            ],
-            [
-                'id' => 5,
-                'plate_number' => 'KCZ 654E',
-                'type' => 'Car',
-                'driver' => 'Sarah Williams',
-                'status' => 'Active',
-                'location' => 'Thika Road, Garden City'
-            ]
-        ];
+        $request = request();
+        $query = Vehicle::query();
 
-        return view('vehicles', ['vehicles' => $vehicles]);
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('plate_number', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('make', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('model', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('year', 'LIKE', "%{$searchTerm}%");
+            });
+        }
+
+        // Paginate results with query string preservation
+        $vehicles = $query->paginate(10)->withQueryString();
+
+        return view('vehicles', compact('vehicles'));
     }
 
     /**
      * Show the form for creating a new vehicle.
      */
-    public function create(): View
-    {
-        return view('vehicles.create');
-    }
+   
 
     /**
      * Store a newly created vehicle in storage.
      */
     public function store(Request $request)
     {
-        // Validate and store the vehicle
-        // Redirect to vehicles index with success message
-        return redirect()->route('vehicles.index')->with('success', 'Vehicle created successfully');
-    }
+        $validated = $request->validate([
+            'plate_number' => 'required|string|max:255|unique:vehicles,plate_number',
+            'make' => 'required|string|max:255',
+            'model' => 'required|string|max:255',
+            'year' => 'required|integer|min:1900|max:' . date('Y'),
+            'status' => 'required|string|in:active,inactive',
+            
+        ]);
+
+        Vehicle::create($validated);
+
+return response()->json([
+        'status'  => 200,
+        'message' => 'Vehicle created successfully',
+        'vehicle' => $validated
+    ]);    }
 
     /**
      * Display the specified vehicle.
      */
-    public function show(string $id): View
+    public function show()
     {
-        // Find the vehicle by ID
-        // Return the vehicle details view
-        return view('vehicles.show', ['id' => $id]);
-    }
+        // Get the ID from the URL segments
+        $segments = request()->segments();
+        $id = end($segments); // Gets the last segment
 
+
+        $vehicle = Vehicle::find($id);
+
+        if (!$vehicle) {
+            return response()->json(['error' => 'Vehicle not found'], 404);
+        }
+
+        return response()->json($vehicle);
+    }
     /**
      * Show the form for editing the specified vehicle.
      */
-    public function edit(string $id): View
+    public function edit($id): View
     {
-        // Find the vehicle by ID
-        // Return the edit form
-        return view('vehicles.edit', ['id' => $id]);
+        $vehicle = Vehicle::findOrFail($id);
+        return view('vehicle_edit', compact('vehicle'));
     }
 
     /**
      * Update the specified vehicle in storage.
      */
-    public function update(Request $request, string $id)
+    public function update($id = null)
     {
-        // Validate and update the vehicle
-        // Redirect to vehicles index with success message
-        return redirect()->route('vehicles.index')->with('success', 'Vehicle updated successfully');
-    }
+        // Handle dynamic routing parameter extraction
+        if (is_array($id)) {
+            $id = $id[0] ?? null;
+        }
 
+        if (!$id) {
+            $segments = request()->segments();
+            $id = end($segments);
+        }
+
+        // Find the vehicle
+        $vehicle = Vehicle::find($id);
+
+        if (!$vehicle) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Vehicle not found'
+            ], 404);
+        }
+
+        // Validate the request
+        $validated = request()->validate([
+            'plate_number' => 'required|string|max:255|unique:vehicles,plate_number,' . $vehicle->id,
+            'make' => 'required|string|max:255',
+            'model' => 'required|string|max:255',
+            'year' => 'required|integer|min:1900|max:' . date('Y'),
+            'status' => 'required|string|in:active,inactive',
+            
+        ]);
+
+        try {
+            $vehicle->update($validated);
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Vehicle updated successfully',
+                'vehicle' => $vehicle->fresh() // Get updated data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Failed to update vehicle: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     /**
      * Remove the specified vehicle from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        // Delete the vehicle
-        // Redirect to vehicles index with success message
-        return redirect()->route('vehicles.index')->with('success', 'Vehicle deleted successfully');
+        $vehicle = Vehicle::findOrFail($id);
+        $vehicle->delete();
+
+        return redirect()->back()->with('error', 'Failed to delete vehicle');
     }
 }
