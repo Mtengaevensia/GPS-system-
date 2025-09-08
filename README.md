@@ -45,9 +45,5 @@ The **GPS Fleet Management System** helps logistics companies, transport busines
   * Visualize data with maps and charts
   * Quick access to important fleet statistics
 
----
 
-⚡ In short: The system gives you **control, visibility, and accountability** over your entire fleet, all from your PC or mobile device.
-
----
 
