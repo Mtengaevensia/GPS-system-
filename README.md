@@ -1,5 +1,5 @@
 
-<h1> GPS Fleet Management System</h1>h1>
+<h1> GPS Fleet Management System</h1>
 
 This web-based **Fleet Management System** is designed to streamline the process of vehicle, driver, and GPS device management. It provides a comprehensive platform for **tracking vehicles in real time, monitoring driver behavior, and analyzing trip data**. The system aims to enhance efficiency, safety, and accountability in fleet operations, ensuring timely deliveries and reduced operational costs.
 
